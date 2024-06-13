@@ -1,0 +1,75 @@
+import { Callout, Steps, Step } from "nextra-theme-docs";
+
+# Inference DB
+
+The Inference DB (InferenceDB) manages inference requests and their corresponding results. It is a core component of Rakis that allows for distributed inference processing. The key responsibilities of the Inference DB are:
+
+- Storing inference requests and their corresponding inference results
+- Managing inference queues and handling inference task distribution
+- Storing and retrieving inference metadata (e.g., inference IDs, inference queues)
+
+## Inference Request and Result Storage
+
+The Inference DB stores and retrieves inference requests and their corresponding results. Each inference request has a unique ID and is stored with its corresponding inference result. The data stored includes:
+
+- The inference request ID
+- The inference request data (input text, model used)
+- The inference result data (output text, token count)
+
+## Inference Queues
+
+The Inference DB also manages inference queues. These are special queues that handle incoming inference requests and distribute them to available inference workers. Each queue has a unique ID and is stored with its corresponding inference data.
+
+An example inference queue is shown below:
+
+```javascript
+const inferenceQueue = new MLCEngine();
+```
+
+This creates a new inference queue using the MLCEngine class. The `MLCEngine` class is used to manage inference queues and their corresponding data.
+
+## Storing Inference Results
+
+Inference results are stored using the `MLCEngine` class. For example:
+
+```javascript
+const inferenceResults = new MLCEngine();
+inferenceResults.push({
+  type: "token",
+  token: "This is an inference token."
+});
+```
+
+This code creates a new `MLCEngine` instance to store inference results. The `MLCEngine` class is used to manage inference results and their corresponding data.
+
+## Using Stored Inference Results
+
+To use stored inference results:
+
+```javascript
+const storedInferenceResults = inferenceResults.results;
+storedInferenceResults.forEach((result) => {
+  // Do something with the result
+});
+```
+
+This code retrieves the stored inference results from the `MLCEngine` instance and loops through them.
+
+# InferenceReveal Example
+
+The following is an example of how the `InferenceReveal` type is used:
+
+```javascript
+import { InferenceReveal } from "../db/packet-types";
+
+const storedInferenceRevealExample = new InferenceReveal();
+storedInferenceRevealExample.push({
+  type: "token",
+  token: "This is an inference token."
+});
+
+const storedInferenceRevealExampleResults = storedInferenceRevealExample.results;
+storedInferenceRevealExampleResults.forEach((result) => {
+  // Do something with the result
+});
+```

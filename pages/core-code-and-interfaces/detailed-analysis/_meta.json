@@ -1,0 +1,12 @@
+{
+  "the-domain": "The Domain In Detail",
+  "distributed-consensus": "Distributed Consensus",
+  "inference-db": "Inference DB",
+  "packet-db": "Packet DB",
+  "peer-db": "Peer DB",
+  "embedding-engine": "Embedding Engine",
+  "llm-engine": "LLM Engine",
+  "p2p-networks": "P2P Networks",
+  "settings-and-configuration": "Settings and Configuration",
+  "utilities": "Utilities"
+}

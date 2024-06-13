@@ -1,0 +1,69 @@
+import { Callout, Steps, Step } from "nextra-theme-docs";
+
+# The Domain: Embedding Queue
+
+The embedding queue in The Domain is responsible for managing the embedding process for inference results and consensus verification. It ensures that the available embedding workers are efficiently utilized and that the most critical tasks are prioritized.
+
+## Embedding Process
+
+In Rakis, the embedding process involves converting text outputs from language models into numerical vector representations, known as embeddings. These embeddings are used for various purposes, including:
+
+1. **Inference Result Embedding**: After a successful inference, the generated text output needs to be embedded to create a binary embedding hash. This hash is used during the consensus process to verify the inference results.
+
+2. **Consensus Verification Embedding**: During the consensus process, Rakis needs to verify the embeddings of the inference outputs submitted by other peers. To do this, it embeds the text outputs and compares them with the submitted binary embedding hashes.
+
+The embedding process is handled by the `EmbeddingEngine` class, which manages the embedding workers and queues the embedding tasks.
+
+## Queue Prioritization
+
+The embedding queue in Rakis is designed to prioritize tasks based on their criticality and expiration times. The following factors are considered for prioritization:
+
+1. **Consensus Verification Priority**: Consensus verification tasks for which the current peer has contributed an inference are given higher priority. This ensures that the consensus process is completed promptly for the peer's own inferences.
+
+2. **Task Expiration Time**: Tasks with earlier expiration times are prioritized over those with later expiration times. This helps to ensure that time-sensitive tasks are processed before they expire.
+
+3. **Task Type**: Inference result embedding tasks are prioritized over consensus verification tasks when they have similar expiration times. This is because inference result embedding is a prerequisite for the consensus process.
+
+The prioritization logic is implemented in the `processEmbeddingQueue` function of the `TheDomain` class. This function sorts the embedding queue based on the aforementioned factors and assigns tasks to available embedding workers.
+
+## Worker Scaling
+
+Rakis supports scaling the number of embedding workers based on the workload. The `EmbeddingEngine` class provides the `scaleEmbeddingWorkers` method, which allows you to increase or decrease the number of workers for a specific embedding model.
+
+When the workload increases, you can scale up the number of workers to handle the additional load. Conversely, when the workload decreases, you can scale down the number of workers to conserve resources.
+
+<Callout emoji="💡">
+Scaling the embedding workers dynamically helps Rakis adapt to varying workloads and ensures efficient resource utilization.
+</Callout>
+
+## Embedding Worker Management
+
+The `EmbeddingEngine` class manages the lifecycle of embedding workers, including their creation, loading, and termination. Each embedding worker is associated with a specific embedding model and is responsible for processing the embedding tasks assigned to it.
+
+The `EmbeddingWorker` interface defines the contract for an embedding worker, which includes methods for loading the model, embedding text inputs, and handling worker-related events.
+
+When a new embedding task is assigned to a worker, the `EmbeddingEngine` sends a message to the worker's Web Worker instance, which processes the task and returns the embedding results.
+
+<Steps>
+
+### Step 1: Assigning Tasks to Workers
+
+1. The `processEmbeddingQueue` function in `TheDomain` identifies available embedding workers and tasks that need to be processed.
+2. It assigns tasks to available workers based on the prioritization logic.
+3. Tasks are sent to the workers' Web Worker instances for processing.
+
+### Step 2: Processing Tasks in Workers
+
+1. The Web Worker instance receives the task and processes it using the loaded embedding model.
+2. The worker computes the embeddings for the given text inputs.
+3. The worker sends the embedding results back to the `EmbeddingEngine`.
+
+### Step 3: Handling Embedding Results
+
+1. The `EmbeddingEngine` receives the embedding results from the workers.
+2. For inference result embeddings, the `InferenceDB` is notified to save the embeddings and proceed with the consensus process.
+3. For consensus verification embeddings, the `InferenceDB` is notified to verify the embeddings and compute the consensus result.
+
+</Steps>
+
+The embedding queue plays a crucial role in ensuring that the embedding process is efficient, prioritized, and scalable, enabling Rakis to handle varying workloads and provide timely consensus results.

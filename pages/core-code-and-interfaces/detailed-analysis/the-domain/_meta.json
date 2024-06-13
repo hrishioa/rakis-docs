@@ -1,0 +1,6 @@
+{
+  "the-domain-connections": "Connections and Event Flow",
+  "the-domain-inference-request-lifecycle": "Inference Request Lifecycle",
+  "the-domain-inference-request-queue": "Inference Request Queue",
+  "the-domain-embedding-queue": "Embedding Queue"
+}

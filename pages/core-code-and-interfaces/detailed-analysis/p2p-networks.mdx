@@ -1,0 +1,215 @@
+import { Callout, Steps, Step } from "nextra-theme-docs";
+
+# P2P Networks
+
+Rakis relies on redundant peer-to-peer (P2P) networks to ensure reliable and decentralized message passing between nodes. This section covers the P2P network implementation in Rakis, including private key cryptography, chain identity management, and the supported P2P networks.
+
+## Private Key Cryptography
+
+In Rakis, each node has a unique `synthientId` and `synthientPrivKey` generated using the `ed25519` elliptic curve cryptography library. The `synthientId` is the public key, and the `synthientPrivKey` is the corresponding private key. These keys are used to sign and verify the authenticity of messages exchanged between nodes.
+
+Here's an example of how the keys are generated:
+
+```typescript
+export function createNewEmptyIdentity(): ClientInfo {
+  const privKey = ed.utils.randomPrivateKey();
+  const pubKey = ed.getPublicKey(privKey);
+
+  const newIdentity: ClientInfo = {
+    synthientId: ed.etc.bytesToHex(pubKey),
+    synthientPrivKey: ed.etc.bytesToHex(privKey),
+    chainIds: [],
+    deviceInfo: getDeviceInfo(),
+  };
+
+  return newIdentity;
+}
+```
+
+The `signJSONObject` and `verifySignatureOnJSONObject` functions are used to sign and verify the authenticity of messages, respectively:
+
+```typescript
+export function signJSONObject(privKey: string, object: any): string {
+  const messageBytes = ed.etc.encodeUTF8(JSON.stringify(object));
+  return ed.sign(messageBytes, hexToBytes(privKey));
+}
+
+export function verifySignatureOnJSONObject(
+  pubKey: string,
+  signature: string,
+  object: any
+): boolean {
+  const messageBytes = ed.etc.encodeUTF8(JSON.stringify(object));
+  return ed.verify(messageBytes, hexToBytes(signature), hexToBytes(pubKey));
+}
+```
+
+## Chain Identities
+
+In addition to the `synthientId`, nodes in Rakis can connect their identities to blockchain addresses. This is accomplished by signing a message with the node's `synthientPrivKey` and verifying the signature against the blockchain address.
+
+Here's an example of how a new chain identity is added:
+
+```typescript
+async addChainIdentity(
+  signature: `0x${string}`,
+  chain: string,
+  signedWithWallet: string
+) {
+  const address = await recoverEthChainAddressFromSignature(
+    this.synthientId,
+    signature
+  );
+
+  if (this.chainIdentities.find((identity) => identity.address === address)) {
+    return true;
+  }
+
+  if (!address) {
+    return false;
+  }
+
+  try {
+    this.chainIdentities.push({
+      address,
+      chain,
+      signedWithWallet,
+      synthientIdSignature: signature,
+    });
+
+    await saveIdentity(this.clientInfo, this.identityPassword);
+
+    await this.packetDB.transmitPacket({
+      type: "peerConnectedChain",
+      createdAt: stringifyDateWithOffset(new Date()),
+      identities: this.chainIdentities,
+    });
+  } catch (err) {
+    return false;
+  }
+
+  return true;
+}
+```
+
+The `chainIdentities` array is part of the `ClientInfo` object, which represents the persistent identity information for a node.
+
+## Supported P2P Networks
+
+Rakis supports multiple P2P networks for message passing, providing redundancy and ensuring reliable communication. The supported networks are:
+
+- GunDB (PewPewDB)
+- NKN
+- Trystero (Nostr and Torrent)
+
+<Callout>
+The specific P2P networks used can be configured in the settings. By default, Rakis uses GunDB, NKN, and Trystero (both Nostr and Torrent).
+</Callout>
+
+These networks are implemented as separate classes extending the `P2PNetworkInstance` abstract class, which defines the common interface for broadcasting and listening to packets.
+
+Here's an example of how a P2P network instance is created:
+
+```typescript
+export class P2PNetworkFactory {
+  static createP2PNetworkInstance(
+    network: SupportedP2PDeliveryNetwork,
+    synthientId: string
+  ): P2PNetworkInstance<any, any> {
+    switch (network) {
+      case "gun":
+        return new GunP2PNetworkInstance(synthientId, {
+          gunPeers: p2pConfig.PEWPEW.bootstrapPeers,
+          gunTopic: p2pConfig.PEWPEW.topic,
+          startupDelayMs: p2pConfig.PEWPEW.bootFixedDelayMs,
+        });
+      case "nkn":
+        return new NknP2PNetworkInstance(
+          synthientId,
+          {
+            nknTopic: p2pConfig.NKN.topic,
+            nknWalletPassword: "password",
+          },
+          p2pConfig.NKN
+        );
+      case "nostr":
+        return new TrysteroP2PNetworkInstance(
+          synthientId,
+          {
+            relayRedundancy: p2pConfig.TRYSTERO.relayRedundancy,
+            rtcConfig: p2pConfig.TRYSTERO.rtcConfig,
+            trysteroTopic: p2pConfig.TRYSTERO.topic,
+            trysteroAppId: p2pConfig.TRYSTERO.appId,
+            trysteroType: "nostr",
+          },
+          p2pConfig.TRYSTERO
+        );
+      case "torrent":
+        return new TrysteroP2PNetworkInstance(
+          synthientId,
+          {
+            relayRedundancy: p2pConfig.TRYSTERO.relayRedundancy,
+            rtcConfig: p2pConfig.TRYSTERO.rtcConfig,
+            trysteroTopic: p2pConfig.TRYSTERO.topic,
+            trysteroAppId: p2pConfig.TRYSTERO.appId,
+            trysteroType: "torrent",
+          },
+          p2pConfig.TRYSTERO
+        );
+      default:
+        throw new Error(`Unsupported P2P network: ${network}`);
+    }
+  }
+}
+```
+
+Each P2P network instance implements the `broadcastPacket` and `listenForPacket` methods, which are used to send and receive messages, respectively.
+
+<Steps>
+
+### Step 1
+
+The P2P networks are initialized during the [Rakis Domain](/the-domain) startup process:
+
+```typescript
+const p2pNetworkInstances: P2PNetworkInstance<any, any>[] =
+  settings.theDomainSettings.enabledP2PNetworks.map((network) =>
+    P2PNetworkFactory.createP2PNetworkInstance(
+      network,
+      clientInfo.synthientId
+    )
+  );
+
+const workingP2PNetworkInstances =
+  await P2PNetworkFactory.initializeP2PNetworks(
+    p2pNetworkInstances,
+    settings.theDomainSettings.waitForP2PBootupMs
+  );
+```
+
+### Step 2
+
+Once the P2P networks are initialized, they are used to broadcast and receive messages:
+
+```typescript
+// Broadcast a packet over all P2P networks
+const broadcastPacket = async (packet: TransmittedPeerPacket) => {
+  await Promise.all(
+    this.p2pNetworkInstances.map((p) => p.broadcastPacket(packet))
+  );
+};
+
+// Listen for packets on all P2P networks
+for (const p2pNetwork of this.p2pNetworkInstances) {
+  const listener = p2pNetwork.listenForPacket(async (packet) => {
+    this.packetDB.receivePacket(packet);
+  });
+
+  // Add listener to shutdown listeners
+  this.shutdownListeners.push(() => listener());
+}
+```
+
+</Steps>
+
+The P2P networks are responsible for reliable message passing between nodes, ensuring that messages are propagated throughout the network. This redundancy helps maintain the decentralized nature of Rakis and ensures that the network remains operational even if one or more P2P networks experience issues.

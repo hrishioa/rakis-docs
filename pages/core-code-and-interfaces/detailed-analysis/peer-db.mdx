@@ -1,0 +1,108 @@
+import { Callout, Steps, Step } from "nextra-theme-docs";
+
+# Peer DB
+
+The Peer DB is responsible for storing and managing information about peers in the Rakis network. It acts as a central repository for peer data, allowing other components of the system to access and update peer-related information as needed.
+
+## Peer Information Storage
+
+The primary function of the Peer DB is to store and retrieve information about peers. This information includes:
+
+- **Synthient ID**: The public key that identifies a peer in the Rakis network.
+- **Last Seen**: The timestamp of when the peer was last seen active in the network.
+- **Seen On**: The list of P2P delivery networks (e.g., Nostr, Torrent, NKN) through which the peer has been observed.
+- **Chain Identities**: The identities (addresses and signatures) of the peer on various blockchain networks they are connected to.
+- **Device Info**: Optional information about the peer's device, which can be used to measure the network's heterogeneity.
+
+This information is stored in a Dexie.js database, which provides a simple and efficient way to manage IndexedDB data within the browser.
+
+## Peer Identity Management
+
+The Peer DB plays a crucial role in managing and verifying the identities of peers in the network. When a peer connects to the network or updates their chain identities, the Peer DB is responsible for verifying the authenticity of the provided information.
+
+<Steps>
+
+### Step 1
+
+The Peer DB receives a packet containing the peer's chain identities, which include the blockchain address, chain, and a signature of the peer's Synthient ID using the blockchain address.
+
+### Step 2
+
+The Peer DB calls the `updateChainIdentities` function, which iterates through the provided chain identities and verifies each one using the `verifyEthChainSignature` function.
+
+```js
+const updatedPeer: Peer = existingPeer || {
+  synthientId: peer.synthientId,
+  seenOn: peer.seenOn,
+  lastSeen: new Date(peer.lastSeen),
+  chainIds: [],
+};
+
+updatedPeer.chainIds = await this.updateChainIdentities(
+  updatedPeer.chainIds,
+  peer.synthientId,
+  peer.chainIds
+);
+```
+
+### Step 3
+
+If the verification succeeds, the Peer DB adds the chain identity to the peer's list of chain identities. If the verification fails, the chain identity is discarded.
+
+</Steps>
+
+By verifying the chain identities, the Peer DB ensures that only valid and authenticated identities are associated with each peer, preventing potential spoofing or impersonation attacks.
+
+## Peer List Management
+
+In addition to storing peer information, the Peer DB is responsible for managing and distributing a list of known peers in the network. This list is essential for maintaining the decentralized nature of Rakis and ensuring that peers can discover and connect with each other.
+
+<Callout>
+The Peer DB implements a probabilistic communication strategy to distribute the peer list. A configurable number of peers (e.g., 40) are randomly selected to broadcast their known peer lists when a new peer joins the network or when a significant number of new peers are discovered.
+</Callout>
+
+This distribution mechanism helps to ensure that the peer list remains up-to-date and that new peers can quickly discover and connect with existing peers in the network.
+
+```js
+const commsProbability = packetDBSettings.peerCommunicationCount / peerList.length;
+
+if (Math.random() < commsProbability) {
+  const knownPeers: KnownPeers = {
+    type: "knownPeers",
+    peerList: peerList.map((peer) => ({
+      synthientId: peer.synthientId,
+      identities: peer.chainIds,
+      lastSeen: peer.lastSeen && stringifyDateWithOffset(peer.lastSeen),
+      seenOn: peer.seenOn,
+    })),
+    createdAt: stringifyDateWithOffset(new Date()),
+  };
+
+  await this.transmitPacket(knownPeers);
+}
+```
+
+By managing and distributing the peer list, the Peer DB facilitates the discovery and connectivity of peers within the Rakis network, ensuring that the network remains decentralized and resilient.
+
+## Querying and Filtering Peers
+
+The Peer DB provides various methods for querying and filtering peers based on different criteria. For example, you can retrieve the last N peers seen after a specific time, get the total number of peers, or retrieve all peers in the database.
+
+```js
+// Get the last N peers seen after a specific time
+await this.db.peers
+  .where("lastSeen")
+  .aboveOrEqual(lastSeenAfter)
+  .limit(maxCount)
+  .toArray();
+
+// Get the total number of peers (optionally after a specific time)
+await this.db.peers.where("lastSeen").aboveOrEqual(lastSeenAfter).count();
+
+// Get all peers in the database
+await this.db.peers.toArray();
+```
+
+These querying capabilities allow other components of Rakis to retrieve and filter peer information as needed, enabling efficient management and utilization of peer data throughout the system.
+
+Overall, the Peer DB plays a vital role in maintaining the decentralized nature of the Rakis network by managing and verifying peer identities, distributing peer lists, and providing efficient querying and filtering capabilities for peer data.

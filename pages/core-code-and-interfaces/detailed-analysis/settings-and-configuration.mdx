@@ -1,0 +1,87 @@
+import { Callout, Steps, Step } from "nextra-theme-docs";
+
+# Settings and Configuration
+
+In Rakis, various settings and configurations are used to control the behavior of the system. These settings are managed through the `loadSettings` and `saveSettings` functions, which interact with the client's localStorage. The settings are divided into several categories, each with its own set of options.
+
+## Loading Settings
+
+The `loadSettings` function is responsible for retrieving and merging the stored settings with the default settings. It returns an object of type `LOADED_SETTINGS`, which contains the following properties:
+
+- `packetDBSettings`: Settings related to the [Packet DB](/packet-db).
+- `p2pSettings`: Settings related to the [P2P Networks](/p2p-networks).
+- `chainConnectionSettings`: Settings related to the blockchain connections.
+- `identityEncryptedKey`: The key used to encrypt and store the user's identity.
+- `loggerSettings`: Settings related to the logging system.
+- `theDomainSettings`: Settings related to [The Domain](/the-domain).
+- `quorumSettings`: Settings related to the [Distributed Consensus](/distributed-consensus) process.
+- `llmEngineSettings`: Settings related to the [LLM Engine](/llm-engine).
+- `workerSettings`: Settings related to the initial worker configurations for the [Embedding Engine](/embedding-engine) and [LLM Engine](/llm-engine).
+
+<Callout>
+If the settings cannot be loaded from localStorage, the function falls back to using the last loaded settings, if available. This ensures that the application can continue running with a valid configuration.
+</Callout>
+
+## Saving Settings
+
+The `saveSettings` function is used to update the stored settings. It takes a `Partial<STORED_SETTINGS>` object as input, which allows you to specify only the settings you want to update. The function then merges the updated settings with the existing settings in localStorage.
+
+## Default Settings
+
+Rakis provides default settings for each category, which are defined as constants in the source code. These constants serve as fallback values in case the corresponding settings are not provided or cannot be loaded from localStorage.
+
+Here are some examples of the default settings:
+
+```javascript
+// Default settings for the Packet DB
+export const DEFAULT_PACKET_DB_SETTINGS = {
+  maxReceivedPacketQueueSize: 100,
+  receivePacketQueueDebounceMs: 100,
+  peerHeartLimit: 20,
+  peerCommunicationCount: 40,
+  maxPacketDBSize: 5000,
+};
+
+// Default settings for the P2P Networks
+export const DEFAULT_P2P_SETTINGS = {
+  topic: "rakis1",
+  maxTransmissionErrorsBeforeRestart: 5,
+};
+
+// Default settings for the Quorum (Consensus) process
+export const DEFAULT_QUORUM_SETTINGS = {
+  quorumRevealRequestIssueTimeoutMs: 10000,
+  quorumRevealTimeoutMs: 20000,
+  quorumConsensusWindowMs: 30000,
+  bEmbeddingThreshold: 0,
+};
+```
+
+These default settings can be overridden by providing new values through the `saveSettings` function or by updating the stored settings directly in localStorage.
+
+<Steps>
+
+### Step 1
+
+To update a specific setting, you can call the `saveSettings` function with the desired values. For example, to update the `topic` for the P2P Networks, you can use:
+
+```javascript
+saveSettings({
+  p2pSettings: {
+    topic: "my-new-topic",
+  },
+});
+```
+
+### Step 2
+
+After updating the settings, you can call `loadSettings` to retrieve the updated configuration:
+
+```javascript
+const settings = loadSettings();
+console.log(settings.p2pSettings.topic); // Output: "my-new-topic"
+```
+
+</Steps>
+
+By following this approach, you can easily manage and update the settings for Rakis according to your specific requirements.

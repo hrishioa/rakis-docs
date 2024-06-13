@@ -1,0 +1,80 @@
+import { Callout, Steps, Step } from "nextra-theme-docs";
+
+# Quorum DB
+
+The Quorum DB is a critical component of the [Inference DB](/inference-db) that manages the consensus process for inference requests. It handles the creation, tracking, and processing of inference quorums, which are groups of peers contributing to a single inference request.
+
+<Callout type="info">
+The Quorum DB plays a crucial role in ensuring the distributed consensus of inference results in Rakis.
+</Callout>
+
+## Quorum Management
+
+The primary responsibility of the Quorum DB is to manage the lifecycle of inference quorums. When an [inference request](/the-domain/the-domain-inference-request-lifecycle) is received, the Quorum DB creates a new quorum entry with the following information:
+
+- `requestId`: A unique identifier for the inference request.
+- `status`: The current status of the quorum, which can be one of the following:
+  - `awaiting_commitments`: Waiting for peers to commit their hashed embeddings.
+  - `awaiting_reveal`: Waiting for peers to reveal their actual embeddings.
+  - `failed`: The quorum failed to reach consensus.
+  - `completed`: The quorum successfully reached consensus.
+  - `awaiting_consensus`: Waiting for the consensus process to complete.
+  - `verifying_consensus`: Verifying the consensus results.
+- `quorumThreshold`: The minimum number of peers required to form a valid quorum.
+- `endingAt`: The deadline for the quorum to complete.
+- `quorumCommitted`: The number of peers that have committed their hashed embeddings.
+- `quorumRevealed`: The number of peers that have revealed their actual embeddings.
+- `consensusRequestedAt`: The timestamp when the consensus process was initiated (if applicable).
+- `embeddingModel`: The name of the embedding model used for this quorum.
+- `quorum`: An array containing information about each peer's commitment and reveal.
+
+As peers submit their commitments (hashed embeddings) and reveals (actual embeddings) for the inference request, the Quorum DB updates the corresponding quorum entry to reflect the current state.
+
+<Steps>
+
+### Step 1: Awaiting Commitments
+
+Initially, the quorum is in the `awaiting_commitments` state. When a peer submits a commitment, the Quorum DB adds the commitment to the `quorum` array and increments the `quorumCommitted` count.
+
+### Step 2: Awaiting Reveal
+
+Once the `quorumCommitted` count reaches the `quorumThreshold`, the quorum transitions to the `awaiting_reveal` state. The Quorum DB then emits a `requestReveal` event, which triggers the [Inference DB](/inference-db) to request reveals from the committed peers.
+
+### Step 3: Awaiting Consensus
+
+After the `quorumRevealTimeoutMs` period has elapsed, the Quorum DB checks if the `quorumRevealed` count has reached the `quorumThreshold`. If so, the quorum transitions to the `awaiting_consensus` state, and the Quorum DB emits a `newQuorumAwaitingConsensus` event.
+
+</Steps>
+
+## Consensus Verification
+
+When a quorum enters the `awaiting_consensus` state, the [Consensus Core](/the-domain/the-domain-connections#consensus-core) is responsible for verifying the consensus and computing the final inference result.
+
+The Quorum DB provides the necessary data for the Consensus Core to perform its computations, including the quorum information, revealed embeddings, and security parameters defined in the [Inference Security Frame](/the-domain/the-domain-inference-request-lifecycle#inference-security-frame).
+
+Once the Consensus Core completes its computations, it generates a `ConsensusResults` object containing the final inference result, rejection packets (if any), and other relevant information. The Quorum DB then stores this `ConsensusResults` object and updates the quorum status accordingly.
+
+If the consensus process is successful, the quorum status is set to `completed`. Otherwise, it is marked as `failed`.
+
+## External Consensus Processing
+
+In addition to handling locally computed consensus results, the Quorum DB can also process external consensus packets received from other peers. This allows Rakis to propagate and verify consensus results in a distributed manner.
+
+When an external `InferenceQuorumComputed` packet is received, the Quorum DB checks if the packet corresponds to an existing quorum. If the packet is valid and has not been processed before, the Quorum DB stores the external consensus result in a separate database (`ExternalConsensusResultsDatabase`).
+
+The external consensus results can be retrieved and displayed alongside the local consensus results, providing a more comprehensive view of the consensus process.
+
+## Querying and Retrieving Quorum Data
+
+The Quorum DB provides several methods for retrieving quorum data, including:
+
+- `getQuorum(requestId)`: Retrieves the quorum information for a specific `requestId`.
+- `getQuorums(requestIds)`: Retrieves an array of quorums for multiple `requestIds`.
+- `getConsensusResults(requestIds)`: Retrieves the consensus results for multiple `requestIds`.
+- `getExternalConsensusResults(requestIds)`: Retrieves the external consensus results for multiple `requestIds`.
+
+These methods can be used by other components of Rakis, such as the [Inference DB](/inference-db), to retrieve and process quorum data as needed.
+
+<Callout type="info">
+The Quorum DB plays a crucial role in ensuring the integrity and distributed consensus of inference results in Rakis. By managing quorums, facilitating the consensus process, and storing consensus results, it helps maintain the decentralized and secure nature of the Rakis network.
+</Callout>

@@ -32,6 +32,7 @@ The bEmbeddings are then used in the [consensus mechanism](/consensus-mechanism)
 ### Step 6
 
 The consensus result is propagated through the [P2P networks](/core-code-and-interfaces/synthient-chain) to other peers, and the final output is persisted to the relevant databases and, potentially, the initiating blockchain.
+
 </Steps>
 
 ## Key Objects and Interfaces
@@ -87,7 +88,10 @@ export type PeerPacket =
 ```
 
 <Callout>
-The `PeerPacket` interface encompasses various packet types, such as `InferenceCommit`, `InferenceRevealRequest`, `InferenceReveal`, and `InferenceQuorumComputed`, which are crucial for the commit-reveal process and consensus mechanism.
+  The `PeerPacket` interface encompasses various packet types, such as
+  `InferenceCommit`, `InferenceRevealRequest`, `InferenceReveal`, and
+  `InferenceQuorumComputed`, which are crucial for the commit-reveal process and
+  consensus mechanism.
 </Callout>
 
 ### InferenceQuorum
