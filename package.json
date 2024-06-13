@@ -1,0 +1,28 @@
+{
+  "dependencies": {
+    "@types/node": "^20.14.2",
+    "next": "^14.2.4",
+    "nextra": "^2.13.4",
+    "nextra-theme-docs": "^2.13.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "typescript": "^5.4.5"
+  },
+  "name": "Rakis-with-lumentis",
+  "description": "Provided is the core code, technical and personal writeup of Rakis, a project I'm building that's meant to provide browser-based decentrzlied inference as a network in a permissionless way.",
+  "version": "0.0.1",
+  "scripts": {
+    "devstart": "next dev -p 5656 & node start.js",
+    "dev": "next dev -p 5656",
+    "build": "next build",
+    "start": "next start"
+  },
+  "keywords": [
+    "Artificial Intelligence",
+    "Generative AI",
+    "Peer-to-peer networks",
+    "cryptocurrency",
+    "smart contracts",
+    "distributed inference"
+  ]
+}

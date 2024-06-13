@@ -1,0 +1,43 @@
+import { Callout, Steps, Step } from "nextra-theme-docs";
+
+# Layer 1: P2P and Peering
+
+The first problem is the oldest problem. How do we build a peer-to-peer system? Rakis tackles this challenge by utilizing multiple peer-to-peer networks for redundant message delivery, ensuring robustness and reliability.
+
+## NAT Hole Punching
+
+One of the key challenges in building a peer-to-peer system is traversing Network Address Translation (NAT) devices. NAT hole punching is a technique used to establish direct connections between peers behind NAT routers. Rakis leverages WebRTC and STUN/TURN servers to facilitate NAT hole punching and enable direct peer-to-peer communication.
+
+<Callout emoji="ℹ️">
+WebRTC (Web Real-Time Communication) is an open-source project that enables real-time communication capabilities in web browsers and mobile applications.
+</Callout>
+
+## STUN and TURN Servers
+
+Rakis utilizes STUN (Session Traversal Utilities for NAT) and TURN (Traversal Using Relays around NAT) servers to facilitate peer discovery and connection establishment. STUN servers help peers determine their public IP address and port, while TURN servers act as relays to enable communication when direct peer-to-peer connections are not possible.
+
+## Redundant Distribution Channels
+
+Rakis employs multiple peer-to-peer networks to ensure redundancy and improve the chances of successful message delivery. Some of the networks used include:
+
+- nkn
+- trystero
+- bittorrent
+- nostr
+- gundb
+
+By leveraging these diverse networks, Rakis can maintain connectivity even if some networks experience issues or limitations.
+
+<Callout emoji="💡">
+The redundancy built into Rakis comes at the cost of carrying multiple libraries, which necessitates efficient deduplication and authentication mechanisms implemented on our side.
+</Callout>
+
+## Gossipsub
+
+Unlike traditional gossiping protocols, Rakis leaves message distribution to the underlying networks. Instead of implementing its own gossiping mechanism, Rakis leverages the pub-sub capabilities of the underlying networks to propagate messages efficiently.
+
+## Peer Discovery
+
+Although peer discovery is not as critical in Rakis compared to other peer-to-peer systems, the project still incorporates lightweight peer discovery mechanisms. This allows nodes to find and connect with other peers on the network, enabling effective communication and collaboration.
+
+By leveraging multiple peer-to-peer networks, redundant message delivery, and lightweight peer discovery, Rakis ensures a robust and reliable foundation for its decentralized inference network. This layered approach allows Rakis to overcome the challenges associated with building a purely in-browser network and enables it to handle massively parallel, compute-intensive tasks without disruption.

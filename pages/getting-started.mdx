@@ -1,0 +1,223 @@
+import { Callout, Steps, Step } from "nextra-theme-docs";
+
+# Getting Started
+
+Setting up and running Rakis is straightforward. Follow the steps below to get started.
+
+<Steps>
+
+### Step 1: Prerequisites
+
+Before you begin, ensure that you have the following prerequisites installed:
+
+- [Node.js](https://nodejs.org/) (version 14 or later)
+- [Yarn](https://classic.yarnpkg.com/en/docs/install) (or npm, if you prefer)
+
+### Step 2: Clone the Repository
+
+Clone the Rakis repository from GitHub:
+
+```bash
+git clone https://github.com/yourusername/rakis.git
+```
+
+### Step 3: Install Dependencies
+
+Navigate to the project directory and install the required dependencies:
+
+```bash
+cd rakis
+yarn install
+```
+
+### Step 4: Configure Settings
+
+Rakis comes with a set of default settings, but you can customize them according to your needs. The settings are located in `src/rakis-core/synthient-chain/thedomain/settings.ts`.
+
+<Callout>
+**Note:** It's recommended to review the settings and make any necessary adjustments before running Rakis.
+</Callout>
+
+### Step 5: Build the Project
+
+Build the project by running the following command:
+
+```bash
+yarn build
+```
+
+### Step 6: Run Rakis
+
+After the build process is complete, you can start Rakis:
+
+```bash
+yarn start
+```
+
+This will launch Rakis in your default browser. You should see a user interface where you can interact with the decentralized inference network.
+
+</Steps>
+
+<Callout emoji="⚠️">
+**Important:** Rakis is designed to run in a browser environment. While it can be run locally, it's recommended to deploy it on a server or hosting platform for optimal performance and accessibility.
+</Callout>
+
+## Configuring Rakis
+
+Rakis provides several configuration options to customize its behavior. Here's an overview of the most commonly used settings:
+
+- **Peer-to-Peer Networks**: Rakis supports multiple P2P networks, such as GunDB, NKN, and Trystero (for Nostr and Torrent). You can enable or disable specific networks in `settings.ts`:
+
+```javascript
+export const DEFAULT_P2P_SETTINGS = {
+  enabledP2PNetworks: ["nostr", "gun", "torrent", "nkn"],
+  // ...
+}
+```
+
+- **Chain Connections**: Rakis can connect to various blockchain networks, such as Ethereum, Arbitrum, and Avalanche. Configure the supported chains and connection details in `settings.ts`:
+
+```javascript
+export const DEFAULT_CHAIN_CONNECTION_SETTINGS = {
+  dAppName: "Rakis",
+  url: "https://rakis.ai",
+}
+```
+
+- **Quorum Settings**: Adjust the quorum settings, such as the timeout for quorum reveals and the consensus window, in `settings.ts`:
+
+```javascript
+export const DEFAULT_QUORUM_SETTINGS = {
+  quorumRevealTimeoutMs: 20000,
+  quorumRevealRequestIssueTimeoutMs: 10000,
+  quorumConsensusWindowMs: 30000,
+  // ...
+}
+```
+
+- **LLM Engine Settings**: Configure the settings for the Large Language Model (LLM) engine, such as the engine log limit and loading progress debounce, in `settings.ts`:
+
+```javascript
+export const DEFAULT_LLM_ENGINE_SETTINGS = {
+  engineLogLimit: 2000,
+  debounceLoadingProgressEventMs: 50,
+}
+```
+
+For more advanced configuration options, refer to the [Core Code and Interfaces](/core-code-and-interfaces) section.
+
+## Running with Custom Settings
+
+To run Rakis with custom settings, follow these steps:
+
+1. Create a new file in the `src/rakis-core/synthient-chain/thedomain` directory, e.g., `custom-settings.ts`.
+2. Import the default settings and modify them as needed:
+
+```typescript
+import { DEFAULT_P2P_SETTINGS, DEFAULT_QUORUM_SETTINGS, LOADED_SETTINGS } from './settings';
+
+const customSettings: LOADED_SETTINGS = {
+  ...DEFAULT_P2P_SETTINGS,
+  ...DEFAULT_QUORUM_SETTINGS,
+  // Modify settings as needed
+  p2pSettings: {
+    ...DEFAULT_P2P_SETTINGS,
+    enabledP2PNetworks: ['nostr', 'gun'], // Enable only Nostr and GunDB
+  },
+  quorumSettings: {
+    ...DEFAULT_QUORUM_SETTINGS,
+    quorumRevealTimeoutMs: 30000, // Increase the reveal timeout to 30 seconds
+  },
+};
+
+export default customSettings;
+```
+
+3. In the entry point of your application (e.g., `src/index.ts`), import your custom settings and pass them to the `TheDomain.bootup` method:
+
+```typescript
+import customSettings from './rakis-core/synthient-chain/thedomain/custom-settings';
+
+TheDomain.bootup({
+  identityPassword: 'your-password',
+  overwriteIdentity: false,
+  initialEmbeddingWorkers: customSettings.workerSettings.initialEmbeddingWorkers,
+  initialLLMWorkers: customSettings.workerSettings.initialLLMWorkers,
+  settings: customSettings,
+});
+```
+
+By following these steps, you can run Rakis with your custom settings without modifying the core codebase.
+
+## Examples and Use Cases
+
+To better understand how to use Rakis, let's explore a few examples and use cases.
+
+### Decentralized Inference
+
+One of the primary use cases of Rakis is decentralized inference. Here's an example of how you can request an inference from the network:
+
+```javascript
+const domain = await TheDomain.bootup({
+  identityPassword: 'your-password',
+  // ...
+});
+
+const prompt = "Write a short story about a robot that dreams of becoming a poet.";
+
+const inferenceRequest: InferenceRequest = {
+  requestId: generateUniqueId(),
+  payload: {
+    fromChain: "ethereum",
+    blockNumber: 12345678,
+    createdAt: new Date().toISOString(),
+    prompt,
+    acceptedModels: ["gemma-2b-it-q4f16_1"],
+    temperature: 0.7,
+    maxTokens: 500,
+    securityFrame: {
+      quorum: 5,
+      maxTimeMs: 60000,
+      secDistance: 0.5,
+      secPercentage: 0.8,
+      embeddingModel: "nomic-ai/nomic-embed-text-v1.5",
+    },
+  },
+  fetchedAt: new Date(),
+};
+
+domain.inferenceDB.saveInferenceRequest(inferenceRequest);
+```
+
+In this example, we create an `InferenceRequest` object with the prompt, accepted models, security frame, and other parameters. We then save the request to the `inferenceDB`, which triggers the inference process on the decentralized network.
+
+You can monitor the progress of the inference and retrieve the results using the methods provided by the `inferenceDB` and `quorumDB`.
+
+### Smart Contract Integration
+
+Rakis can integrate with smart contracts on various blockchain networks. Here's an example of how you can add a chain identity to your Rakis node:
+
+```javascript
+const domain = await TheDomain.bootup({
+  identityPassword: 'your-password',
+  // ...
+});
+
+const signature = "0x..."; // Signature of your synthientId obtained from your wallet
+const chain = "ethereum";
+const signedWithWallet = "metamask";
+
+const success = await domain.addChainIdentity(signature, chain, signedWithWallet);
+
+if (success) {
+  console.log("Chain identity added successfully!");
+} else {
+  console.error("Failed to add chain identity.");
+}
+```
+
+In this example, we obtain a signature of our `synthientId` from our Ethereum wallet (e.g., MetaMask). We then call the `addChainIdentity` method on the `TheDomain` instance, passing the signature, chain name, and the wallet used for signing.
+
+Once the chain identity is added, Rakis can interact with smart contracts on that chain, enabling various use cases such as decentralized inference as a service, self-executing grants and trusts, and more.
+
+For more examples and use cases, refer to the [Core Code and Interfaces](/core-code-and-interfaces) and [Future Work and Roadmap](/future-work-and-roadmap) sections.

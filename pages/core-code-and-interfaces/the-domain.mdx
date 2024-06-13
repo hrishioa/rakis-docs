@@ -1,0 +1,141 @@
+import { Callout, Steps, Step } from "nextra-theme-docs";
+
+# The Domain
+
+The Domain is the central orchestrator of the Rakis network, responsible for managing the various components and coordinating the overall system. It serves as the entry point for interacting with the network and handles the flow of data among different layers.
+
+## Settings
+
+Before diving into the details of The Domain, it's essential to understand the settings that govern its behavior. These settings are loaded from the user's local storage or a default configuration if no stored settings are found. The `loadSettings` function retrieves these settings, merging any user-defined values with the default settings.
+
+<Callout>
+**Note:** The settings can be modified at runtime using the `saveSettings` function, which persists the changes in the user's local storage.
+</Callout>
+
+Some of the key settings that influence The Domain's behavior are:
+
+- `enabledP2PNetworks`: The list of peer-to-peer networks that Rakis should utilize for communication and data dissemination.
+- `waitForP2PBootupMs`: The maximum time (in milliseconds) to wait for the P2P networks to initialize before considering them unresponsive.
+- `inferencePollingIntervalMs`: The interval (in milliseconds) at which Rakis should check for new inference requests.
+- `inferenceRequestQueueDebounceMs`: The debounce interval (in milliseconds) for processing the inference request queue.
+- `embeddingsQueueDebounceMs`: The debounce interval (in milliseconds) for processing the embeddings queue.
+- `requestSimilarityTimeWindowMs`: The time window (in milliseconds) within which inference requests are considered similar and subjected to probabilistic selection.
+
+## The Domain Class
+
+The `TheDomain` class is the core component that orchestrates the entire Rakis network. It manages the initialization and coordination of various subcomponents, including the packet database, inference database, embedding engine, and language model (LLM) engine.
+
+### Initialization
+
+The `TheDomain` class is initialized through the `bootup` static method, which takes the following options:
+
+- `identityPassword`: The password used to encrypt and decrypt the user's identity.
+- `overwriteIdentity` (optional): A flag indicating whether to overwrite the existing identity or not.
+- `initialEmbeddingWorkers`: An array of objects specifying the initial embedding workers to be created, including the model name and count.
+- `initialLLMWorkers`: An array of objects specifying the initial LLM workers to be created, including the model name and count.
+
+The initialization process involves the following steps:
+
+<Steps>
+
+### Step 1
+
+Initialize the client information, including the user's identity and associated chain identities.
+
+### Step 2
+
+Create instances of the peer-to-peer (P2P) network for each enabled network specified in the settings.
+
+### Step 3
+
+Instantiate the `TheDomain` class with the client information, P2P network instances, and the specified initial embedding and LLM workers.
+
+### Step 4
+
+Broadcast a "boot" status update and any connected chain identities over the P2P networks.
+
+</Steps>
+
+### Hooking Up Connections
+
+The `TheDomain` class establishes connections between various components to facilitate data flow and event handling. Here are some key connections:
+
+- **P2P Network to Packet Database**: Received packets from the P2P networks are forwarded to the packet database for processing.
+- **Packet Database to Inference Database**: Inference-related packets received from the P2P networks are passed to the inference database for further processing.
+- **Inference Database to Packet Database**: Inference-related packets generated within the inference database are propagated to the P2P networks through the packet database.
+- **Inference Database to Embedding Engine**: When a new inference result or consensus quorum is ready for embedding, the inference database notifies the embedding engine.
+- **Embedding Engine to Inference Database**: Once embeddings are computed, the embedding engine notifies the inference database with the results.
+- **Inference Database to LLM Engine**: When a new active inference request is received, the inference database notifies the LLM engine to process it.
+- **LLM Engine to Inference Database**: After completing an inference, the LLM engine sends the result back to the inference database for storage and further processing.
+
+These connections facilitate the flow of data and events between the different components, ensuring efficient communication and coordination within the Rakis network.
+
+### Key Methods and Event Handlers
+
+The `TheDomain` class provides several key methods and event handlers to manage the overall system:
+
+- `processEmbeddingQueue`: This method processes the embedding queue, prioritizing consensus verifications and inference results based on their expiration times and the availability of embedding workers.
+- `processInferenceRequestQueue`: This debounced method processes the inference request queue by selecting an appropriate inference request, assigning it to an available LLM worker, and handling the inference result.
+- `addChainIdentity`: This method allows users to add a new chain identity to their Rakis identity, verifying the signature and updating the necessary databases.
+- `shutdownDomain`: This method gracefully shuts down the Rakis network, invoking shutdown listeners for various components to perform cleanup tasks.
+
+Additionally, The Domain class sets up event handlers to respond to various events emitted by the inference database, embedding engine, and LLM engine. These handlers facilitate the coordination and communication between different components, ensuring efficient and timely processing of inference requests, embeddings, and consensus verifications.
+
+## Connectors
+
+The Rakis project includes two key connectors that facilitate the communication between different components:
+
+1. **`saveInferencePacketsFromP2PToInferenceDB`**: This connector listens for inference-related packets received from the P2P networks and forwards them to the inference database for processing. It handles packets such as inference requests, commits, reveal requests, and reveals.
+
+2. **`propagateInferencePacketsFromInferenceDBtoP2P`**: This connector listens for events emitted by the inference database and propagates the corresponding packets to the P2P networks through the packet database. It handles events such as new inference embeddings, quorum reveal requests, inference reveals, and consensus packets.
+
+These connectors serve as bridges between the different layers of the Rakis architecture, ensuring seamless data flow and communication between the P2P networks, packet database, and inference database.
+
+## Examples and Code Snippets
+
+To better understand the functionality of The Domain and its interactions with other components, let's examine a code snippet that demonstrates the process of handling a new inference request:
+
+```typescript
+// Inside TheDomain class
+this.inferenceDB.on("newActiveInferenceRequest", (request) => {
+  setTimeout(() => this.processInferenceRequestQueue(), 0);
+});
+
+// Inside processInferenceRequestQueue
+const selectedInference = /* ... logic to select an inference request ... */;
+
+this.inferenceStatus.inferenceIdsInProcess.push(selectedInference.requestId);
+
+this.llmEngine
+  .runInferenceNonStreaming({
+    modelName: selectedInference.payload.acceptedModels[0],
+    messages: [{ role: "user", content: selectedInference.payload.prompt }],
+  })
+  .then((response) => {
+    // Handle successful inference result
+    return this.inferenceDB.saveInferenceResult({
+      requestId: selectedInference.requestId,
+      // ... other result data ...
+      result: response,
+    });
+  })
+  .catch((err) => {
+    // Handle inference error
+    return this.inferenceDB.saveInferenceResult({
+      requestId: selectedInference.requestId,
+      // ... other result data ...
+      result: {
+        success: false,
+        error: err,
+      },
+    });
+  });
+```
+
+In this example, when a new active inference request is received by the inference database, The Domain is notified through the `newActiveInferenceRequest` event. It then triggers the `processInferenceRequestQueue` method, which selects an appropriate inference request based on various factors (e.g., available LLM workers, accepted models).
+
+The selected inference request is then passed to the LLM engine for processing (`runInferenceNonStreaming`). Upon successful completion, the inference result is saved in the inference database (`saveInferenceResult`). If an error occurs during inference, an error result is saved instead.
+
+This code snippet demonstrates how The Domain orchestrates the flow of inference requests, coordinates with the LLM engine for inference processing, and updates the inference database with the results.
+
+For more examples and code snippets, refer to the [Core Code and Interfaces](/core-code-and-interfaces) section, which provides a comprehensive overview of the core components and their interactions within the Rakis network.

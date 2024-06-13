@@ -1,0 +1,55 @@
+import { Callout, Steps, Step } from "nextra-theme-docs";
+
+# Layer 5: Persistence and Events
+
+Rakis uses a combination of blockchains and local databases for persistence and event-driven communication between layers. This allows for a decentralized, scalable, and flexible architecture that can support a wide range of use cases.
+
+## Blockchain Integration
+
+Rakis integrates with various blockchains, such as Ethereum, Arbitrum, and others, to provide a decentralized and immutable storage layer. The core idea is that AI contracts on these blockchains can interface with the Rakis network, allowing for seamless integration between on-chain and off-chain computation.
+
+<Callout type="info">
+Rakis supports multiple blockchains, making it a versatile solution for decentralized AI applications.
+</Callout>
+
+## Synthients
+
+Nodes on the Rakis network are called synthients, named after the race of embodied AIs in the Matrix. Each synthient can connect any number of chain identities to their synthientId, which allows for future incentivization mechanisms.
+
+## AI Contracts
+
+AI contracts are smart contracts deployed on supported blockchains that can interact with the Rakis network. The typical flow of an AI contract is as follows:
+
+<Steps>
+### Step 1
+
+The AI contract is called by other smart contracts with the payment and inference parameters.
+
+### Step 2
+
+The AI contract emits an event, which nodes on the Rakis network listen to.
+
+### Step 3
+
+Once the inference is computed, the result is pushed back to the blockchain, either through exit nodes or by pushing multiple consensus outputs to the chain and having the contract check for agreement.
+
+### Step 4
+
+The AI contract calls the original calling contract with the remaining capital and the result.
+</Steps>
+
+This design allows for any supported blockchain to be connected to the Rakis network, while still allowing blocks to continue on the original chain while the inference is being processed.
+
+## Cross-Chain Support
+
+Rakis aims to support multiple blockchains, allowing for a wide range of use cases and applications. The core idea is to have a single compiled web page that can be served statically, saved locally, and inspected and modified by the user. This approach ensures that there are no hidden parts of the network and that users have full control over their participation.
+
+## Local Persistence and Events
+
+Locally, Rakis uses a combination of Dexie (an IndexedDB wrapper) and custom databases with emitted events for communication between layers. This allows for efficient and scalable local storage and processing, while still maintaining a decentralized architecture.
+
+<Callout type="info">
+For more details on the specific databases used in Rakis, see the [Databases](/core-code-and-interfaces/databases) section.
+</Callout>
+
+By using a layered architecture with separate databases and typespecs for persistence at each layer, Rakis achieves a modular and extensible design. Layers communicate with each other through events and maintain their own internal queues to manage impedance mismatches as they happen. This approach makes it easier to modify, add new features, and refactor different parts of the system in the future.

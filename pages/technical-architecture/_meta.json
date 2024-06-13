@@ -1,0 +1,8 @@
+{
+  "layer-1-p2p-and-peering": "Layer 1: P2P and Peering",
+  "layer-2-inference": "Layer 2: Inference",
+  "layer-3-coordination": "Layer 3: Coordination",
+  "layer-4-consensus": "Layer 4: Consensus",
+  "layer-5-persistence": "Layer 5: Persistence",
+  "layer-6-events": "Layer 5: Events"
+}

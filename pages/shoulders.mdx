@@ -1,0 +1,51 @@
+import { Callout, Steps, Step } from "nextra-theme-docs";
+
+# Shoulders of Giants
+
+Rakis is built on the shoulders of giants, leveraging the work of numerous open-source projects and technologies. This section highlights the key dependencies and projects that made Rakis possible, and explores the technologies involved.
+
+## Web-LLM from MLCAI
+
+[Web-LLM](https://mlc.ai/web-llm/) from MLCAI is a crucial component of Rakis, enabling the running of large language models directly in the browser. It provides a high-performance WebAssembly runtime and a set of APIs for loading and executing LLMs. Rakis utilizes Web-LLM to power its inference layer, allowing for decentralized and browser-based AI inference.
+
+<Callout type="info">
+Web-LLM is a game-changer for browser-based AI, enabling the execution of large models without the need for server-side infrastructure.
+</Callout>
+
+## @xenova/transformers
+
+[@xenova/transformers](https://github.com/xenova/transformers.js) is a powerful library for working with transformer models in JavaScript. It provides a set of tools and utilities for loading, processing, and executing transformer models. Rakis leverages @xenova/transformers for tasks such as tokenization, encoding, and decoding, simplifying the integration of transformer models into the project.
+
+## @noble/ed25519
+
+[@noble/ed25519](https://github.com/paulmillr/noble-ed25519) is a high-performance implementation of the Ed25519 digital signature algorithm in JavaScript. Rakis utilizes @noble/ed25519 for secure cryptographic operations, such as signing and verifying messages in the P2P network. It ensures the integrity and authenticity of communication between nodes in the Rakis network.
+
+## NKN
+
+[NKN](https://nkn.org/) (New Kind of Network) is a decentralized data transmission network that enables fast, secure, and low-cost data transfer. Rakis integrates NKN as one of its P2P delivery networks, leveraging its capabilities for efficient and reliable data transmission between nodes. NKN's decentralized architecture aligns well with Rakis' goal of creating a permissionless and decentralized inference network.
+
+## GunDB
+
+[GunDB](https://gun.eco/) is a decentralized, real-time, offline-first database that provides a simple and powerful API for building distributed applications. Rakis uses GunDB as one of its P2P delivery networks, leveraging its real-time synchronization and offline capabilities. GunDB enables seamless data replication and synchronization across nodes in the Rakis network.
+
+## Trystero with BitTorrent and Nostr
+
+[Trystero](https://github.com/Hermitter/trystero) is a library for building decentralized applications using BitTorrent and Nostr (Notes and Other Stuff Transmission). Rakis integrates Trystero to enable efficient and decentralized data distribution and communication between nodes. BitTorrent provides a robust and scalable protocol for data sharing, while Nostr serves as a decentralized pub/sub messaging system. By combining these technologies, Rakis achieves high performance and resilience in its P2P layer.
+
+## shadcn/ui
+
+[shadcn/ui](https://ui.shadcn.com/) is a beautifully designed component library for building modern user interfaces. Rakis leverages shadcn/ui to create an intuitive and visually appealing user interface. The pre-built components and styling utilities provided by shadcn/ui greatly simplify the development process and ensure a consistent and polished look and feel across the Rakis application.
+
+## wagmi and viem
+
+[wagmi](https://wagmi.sh/) and [viem](https://viem.sh/) are powerful libraries for integrating Ethereum and other EVM-compatible blockchains into web applications. Rakis utilizes wagmi and viem to enable seamless interaction with smart contracts and blockchain networks. These libraries provide a set of hooks, utilities, and abstraction layers that simplify the process of connecting to wallets, signing transactions, and interacting with smart contracts. By leveraging wagmi and viem, Rakis enables decentralized persistence and incentivization mechanisms.
+
+## Dexie.js
+
+[Dexie.js](https://dexie.org/) is a lightweight and easy-to-use wrapper for IndexedDB, providing a simple and intuitive API for working with client-side databases. Rakis utilizes Dexie.js for efficient local data storage and retrieval. It enables fast and reliable data persistence within the browser, allowing Rakis to store and manage inference results, embeddings, and other relevant data. Dexie.js simplifies database operations and provides a performant solution for client-side data management.
+
+<Callout type="success">
+By standing on the shoulders of these remarkable projects and technologies, Rakis is able to deliver a powerful and innovative decentralized inference network. The combination of cutting-edge AI capabilities, decentralized networking, and intuitive user interfaces makes Rakis a unique and compelling project in the realm of browser-based AI.
+</Callout>
+
+We extend our heartfelt gratitude to the developers and communities behind these projects. Their hard work and dedication have paved the way for projects like Rakis to push the boundaries of what is possible with browser-based AI and decentralized technologies. Together, we are building a future where AI is accessible, decentralized, and empowering for all.

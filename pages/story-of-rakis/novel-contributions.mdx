@@ -1,0 +1,69 @@
+import { Callout, Steps, Step } from "nextra-theme-docs";
+
+# Novel Contributions
+
+Rakis presents several novel contributions to the field of decentralized AI inference and smart contract integration. Let's explore these contributions in detail.
+
+## Browser-based Inference Network
+
+One of the key innovations in Rakis is the creation of a purely browser-based inference network. This means that the entire network runs within the browser environment, without relying on any external servers or centralized infrastructure.
+
+<Callout emoji="💡">
+By leveraging the power of modern browsers and technologies like WebAssembly and WebRTC, Rakis enables a truly decentralized and client-side approach to AI inference.
+</Callout>
+
+The browser-based architecture offers several advantages:
+
+- **Accessibility**: Anyone with a compatible web browser can participate in the Rakis network as a contributing node.
+- **Democratization**: It levels the playing field by allowing individuals with varying compute resources to contribute to the network.
+- **Privacy**: Sensitive data never leaves the client-side environment, enhancing privacy and security.
+
+However, building a complex inference network within the browser also presents challenges, such as managing parallel compute-intensive tasks and handling impedance mismatches. Rakis addresses these challenges through a layered architecture and efficient queue management.
+
+## Consensus Mechanism
+
+Another significant contribution of Rakis is its novel consensus mechanism for decentralized inference. Traditional consensus mechanisms in peer-to-peer networks often rely on deterministic computation, making them unsuitable for AI inference tasks that involve non-deterministic language models.
+
+Rakis introduces an embedding-based consensus mechanism with adjustable security bindings. It works as follows:
+
+<Steps>
+### Step 1: Inference Request
+
+Nodes in the network receive an inference request specifying the prompt, temperature, and security frame (quorum size, similarity distance, and percentage).
+
+### Step 2: Inference Execution
+
+Nodes execute the inference task independently within the allotted time.
+
+### Step 3: Commit Phase
+
+Nodes exchange hashes representing their inference results, locking them in without revealing the actual outputs.
+
+### Step 4: Reveal Phase
+
+If enough commits are received, nodes form a quorum and request a reveal. Outputs are verified against the commits.
+
+### Step 5: Consensus Computation
+
+Inference outputs are embedded, and clustering is performed in the high-dimensional embedding space to find the largest cluster within the specified similarity distance. Outliers are considered failing, and a deterministic hash is used to select the final output.
+</Steps>
+
+This consensus mechanism allows for fuzzy agreement on inference outputs while maintaining the security and integrity of the network.
+
+## Oracle for Embeddable Data
+
+Rakis also presents a novel approach to connecting diverse sources of embeddable information to decentralized systems. By leveraging the embedding-based consensus mechanism, Rakis acts as an oracle for text-based data streams.
+
+<Callout emoji="🌉">
+This opens up possibilities for integrating various data sources, such as news articles, earnings reports, and other unstructured or semi-structured data, into smart contracts and decentralized applications.
+</Callout>
+
+The oracle functionality of Rakis enables a wide range of applications, including:
+
+- **Sentiment analysis**: Analyzing the sentiment of news articles or social media posts to trigger specific actions in smart contracts.
+- **Event detection**: Identifying relevant events from text-based data streams and notifying decentralized applications.
+- **Data verification**: Verifying the authenticity and consistency of information across multiple sources.
+
+By providing a decentralized and trustless mechanism for integrating embeddable data, Rakis opens up new possibilities for data-driven decision-making in decentralized systems.
+
+These novel contributions position Rakis as a pioneering project in the intersection of AI, decentralization, and smart contract integration. To learn more about the technical details behind these innovations, refer to the [Technical Architecture](/technical-architecture) section.

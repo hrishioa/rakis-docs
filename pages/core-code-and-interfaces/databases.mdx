@@ -1,0 +1,92 @@
+import { Callout, Steps, Step } from "nextra-theme-docs";
+
+# Databases
+
+Rakis relies on several databases to store and manage various types of data. These databases are built using the [Dexie](https://dexie.org/) library, which provides a powerful IndexedDB-based solution for storing structured data in the browser. In this section, we'll explore the different databases used in Rakis and their respective purposes.
+
+## Entities
+
+Before diving into the databases, let's briefly discuss the key entities used in Rakis:
+
+- **Peer**: Represents a node on the Rakis network, identified by its `synthientId` (public key). Peers can be connected to one or more blockchain identities (e.g., Ethereum addresses).
+- **InferenceRequest**: An AI inference request originating from a smart contract or peer, containing details such as the prompt, temperature, and security frame.
+- **InferenceResult**: The output of an AI inference, including the generated text, token count, and embedding information.
+- **InferenceCommit**: A commitment to an inference result, represented by a hash of the binary embedding.
+- **InferenceReveal**: The actual inference result, including the generated text, embedding, and binary embedding.
+- **InferenceQuorum**: A group of inference results that need to reach consensus based on the specified security frame.
+- **ConsensusResult**: The final agreed-upon inference result after consensus is achieved within a quorum.
+
+These entities are stored and managed across various databases within Rakis.
+
+## Packet DB
+
+The Packet DB is responsible for handling incoming and outgoing packets on the Rakis network. It serves as the central hub for processing and distributing packets related to inference requests, commits, reveals, and consensus results.
+
+<Steps>
+
+### Step 1
+
+The Packet DB listens for incoming packets from various P2P networks (e.g., GunDB, NKN, Trystero) and processes them accordingly. When a new packet is received, the Packet DB performs the following tasks:
+
+- Verifies the packet's signature and integrity.
+- Deduplicates and filters out any duplicate packets.
+- Emits events corresponding to the packet type (e.g., `newP2PInferenceRequest`, `newInferenceCommit`, `newInferenceRevealed`).
+- Saves the packet to the database for persistence.
+
+### Step 2
+
+The Packet DB also handles outgoing packets, such as propagating inference requests, commits, reveals, and consensus results to the P2P networks. This is done by transmitting the relevant packets to the connected P2P network instances.
+
+</Steps>
+
+Additionally, the Packet DB manages peer information by processing `KnownPeers` packets and updating the Peer DB accordingly.
+
+## Inference DB
+
+The Inference DB is responsible for managing the lifecycle of inference requests, results, and embeddings. It serves as the bridge between the Packet DB and the Quorum DB, handling the flow of data between these components.
+
+<Steps>
+
+### Step 1
+
+When a new inference request is received (either from the Packet DB or a connected blockchain), the Inference DB processes and stores it in the database. It also calculates the `endingAt` time based on the security frame specified in the request.
+
+### Step 2
+
+As inference results become available, the Inference DB stores them in the database and emits events to trigger the embedding process. Once the embeddings are computed, they are also stored in the Inference DB.
+
+### Step 3
+
+The Inference DB communicates with the Quorum DB to manage quorums and consensus. It emits events to request quorum reveals and processes incoming inference reveals and consensus results from the Quorum DB.
+
+</Steps>
+
+The Inference DB acts as a central hub for managing the entire inference lifecycle, from request to consensus, while interacting with other components of the Rakis system.
+
+## Quorum DB
+
+The Quorum DB is responsible for managing quorums, consensus calculations, and consensus results. It works closely with the Inference DB to facilitate the consensus process.
+
+<Steps>
+
+### Step 1
+
+As inference requests are processed, the Quorum DB creates and manages quorums based on the specified security frame. It tracks the commitments and reveals received for each quorum, updating the quorum status accordingly.
+
+### Step 2
+
+Once a quorum has received enough reveals, the Quorum DB initiates the consensus process. It computes the final consensus result using the specified clustering algorithm and security parameters.
+
+### Step 3
+
+The Quorum DB stores the consensus results and emits events to propagate them back to the Inference DB and eventually to the Packet DB for distribution across the network.
+
+</Steps>
+
+The Quorum DB plays a crucial role in ensuring consensus is achieved for inference requests, following the specified security parameters and employing the appropriate clustering algorithms.
+
+These databases work together seamlessly to provide a robust and reliable infrastructure for managing the various components of the Rakis system, from peer information to inference requests, results, and consensus.
+
+<Callout emoji="💡">
+It's important to note that while the databases in Rakis are built using IndexedDB, the system is designed to be extensible and can potentially integrate with other storage solutions, such as distributed databases or blockchains, in the future.
+</Callout>

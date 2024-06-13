@@ -1,0 +1,75 @@
+import { Callout, Steps, Step } from "nextra-theme-docs";
+
+# Layer 5: Events
+
+Rakis employs a unique event-driven architecture to facilitate communication between different layers of the system. This architecture allows for efficient handling of high-volume data flows and enables the system to scale gracefully.
+
+## Connector Mechanism
+
+The connector mechanism is the backbone of the event-driven architecture in Rakis. It consists of different layers emitting events, which are then processed by internal queues. The use of queues and debouncing techniques allows Rakis to handle higher scale and volume efficiently.
+
+<Callout type="info">
+The connector mechanism is a critical component of Rakis, enabling seamless communication between different layers of the system.
+</Callout>
+
+## Key Databases and Events
+
+Rakis utilizes several key databases to store and manage data:
+
+- **PacketDB**: Stores received and transmitted peer packets.
+- **InferenceDB**: Manages inference requests, results, and embeddings.
+- **QuorumDB**: Handles quorum formation and consensus-related data.
+
+Each database emits events when specific actions occur, such as:
+
+- New inference request received
+- Inference result awaiting embedding
+- Quorum ready for reveal
+- Consensus packets generated
+
+These events are then processed by the appropriate layers of the system.
+
+## Event Processing Flow
+
+The event processing flow in Rakis follows these steps:
+
+<Steps>
+### Step 1: Event Emission
+
+A database emits an event when a specific action occurs, such as a new inference request being received.
+
+### Step 2: Event Queueing
+
+The emitted event is added to an internal queue for processing. Queues help manage the flow of events and prevent overwhelming the system.
+
+### Step 3: Debounced Processing
+
+The queued events are processed using a debounced approach, which groups similar events and processes them in batches. This technique helps optimize resource usage and improves overall performance.
+
+### Step 4: Probabilistic Selection
+
+In some cases, such as when selecting an inference request to process, Rakis employs a probabilistic selection mechanism. This adds randomization to the inference processing, ensuring a fair distribution of resources.
+
+</Steps>
+
+## Queues and Event Handlers
+
+Rakis utilizes several queues and event handlers to process events efficiently:
+
+- **Inference Request Queue**: Manages incoming inference requests and selects requests for processing based on available resources and probabilistic selection.
+- **Embedding Queue**: Handles embedding tasks for inference results and consensus verification.
+- **Consensus Queue**: Processes quorums ready for consensus and generates consensus packets.
+
+Each queue has associated event handlers that listen for specific events and trigger the appropriate actions.
+
+## Conclusion
+
+The event-driven architecture and connector mechanism in Rakis enable efficient communication between different layers of the system. By utilizing queues, debouncing techniques, and probabilistic selection, Rakis can handle high-volume data flows and scale gracefully. This architecture is a critical component of Rakis, ensuring smooth operation and optimal performance.
+
+For more information on other aspects of the Rakis architecture, see:
+
+- [Layer 1: P2P and Peering](/technical-architecture/layer-1-p2p-and-peering)
+- [Layer 2: Inference](/technical-architecture/layer-2-inference)
+- [Layer 3: Coordination](/technical-architecture/layer-3-coordination)
+- [Layer 4: Consensus](/technical-architecture/layer-4-consensus)
+- [Layer 5: Persistence](/technical-architecture/layer-5-persistence)

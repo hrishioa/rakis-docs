@@ -1,0 +1,68 @@
+import { Callout, Steps, Step } from "nextra-theme-docs";
+
+# Technical Architecture
+
+Rakis employs a layered architecture to handle the massively parallel, compute-intensive tasks required for decentralized inference. This approach ensures that the various components can function independently without disrupting each other. The layers communicate through events, maintaining their own internal queues to manage impedance mismatches as they arise.
+
+Web Workers are extensively utilized to offload computations from the main thread, enhancing overall performance. However, it's important to note that certain critical components, such as those relying on WebRTC, cannot be moved into workers and must remain in the main thread.
+
+The layered architecture not only simplifies modifications and additions but also facilitates future refactoring, migration, and strengthening of different system aspects.
+
+<Callout>
+While the browser proves to be an accessible environment for running complex applications like Rakis, there are still areas where improvements are needed. This project has highlighted the edges where the browser needs to evolve further to support more advanced use cases.
+</Callout>
+
+The technical architecture consists of the following layers:
+
+### Layer Overview
+
+- **Layer 1: [P2P and Peering](/technical-architecture/layer-1-p2p-and-peering)**
+  - Handling peer-to-peer networking and peer discovery
+- **Layer 2: [Inference](/technical-architecture/layer-2-inference)**
+  - Managing inference requests, workers, embeddings, and queue management
+- **Layer 3: [Coordination](/technical-architecture/layer-3-coordination)**
+  - Coordinating network events, commit-reveal process, and quorum building
+- **Layer 4: [Consensus](/technical-architecture/layer-4-consensus)**
+  - Computing final consensus using embeddings and hashing, propagating results
+- **Layer 5: [Persistence](/technical-architecture/layer-5-persistence)**
+  - Integrating with blockchains for persistence and incentivization
+
+By separating concerns into distinct layers, Rakis achieves modularity, scalability, and maintainability, allowing for independent development and optimization of each component.
+
+<Callout>
+The key benefit of the layered architecture is the ability to replace or modify individual layers without impacting the entire system. This flexibility ensures that Rakis can adapt to evolving requirements and technological advancements.
+</Callout>
+
+### Data Flow
+
+The data flow within Rakis follows a well-defined path, facilitating efficient processing and communication between components. Here's a high-level overview of the data flow:
+
+<Steps>
+
+### Step 1
+
+Inference requests originate from various sources, such as smart contracts or decentralized applications (dApps). These requests, containing prompts, security frames, and other parameters, are received by the [P2P and Peering](/technical-architecture/layer-1-p2p-and-peering) layer.
+
+### Step 2
+
+The [Inference](/technical-architecture/layer-2-inference) layer handles the inference requests, managing the scheduling, execution, and result processing using inference workers and embedding workers.
+
+### Step 3
+
+The [Coordination](/technical-architecture/layer-3-coordination) layer oversees the commit-reveal process, timeout-based scheduling, and quorum building for the inference requests.
+
+### Step 4
+
+The [Consensus](/technical-architecture/layer-4-consensus) layer computes the final consensus using embeddings and hashing algorithms, propagating the consensus results to the network.
+
+### Step 5
+
+The [Persistence](/technical-architecture/layer-5-persistence) layer integrates with various blockchains, enabling persistence of inference results, incentivization mechanisms, and cross-chain support.
+
+</Steps>
+
+This architectural approach ensures that each layer can focus on its specific responsibilities, while inter-layer communication occurs through well-defined interfaces and events.
+
+<Callout>
+The layered architecture, combined with the efficient data flow, allows Rakis to process inference requests in a decentralized and scalable manner, leveraging the collective computing power of the network.
+</Callout>

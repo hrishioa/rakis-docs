@@ -1,0 +1,148 @@
+import { Callout, Steps, Step } from "nextra-theme-docs";
+
+# Core Code and Interfaces
+
+The core code and interfaces of Rakis are organized into several key components that work together to enable the decentralized inference network. This section will provide an overview of the essential elements and interfaces, covering the inference lifecycle, key objects, and their interactions.
+
+## Inference Lifecycle
+
+The inference lifecycle in Rakis involves several stages, spanning from the initial inference request to the final consensus result. Let's follow the journey of an inference request through the system:
+
+<Steps>
+### Step 1
+
+An inference request is initiated, either through a smart contract on a supported blockchain or directly from a peer on the network. The request specifies parameters such as the prompt, accepted models, temperature, max tokens, and a security frame.
+
+### Step 2
+
+The request is processed by the [InferenceDB](/core-code-and-interfaces/databases#inferencedb), which validates the request and schedules it for execution based on the specified security frame and available resources.
+
+### Step 3
+
+The [TheDomain](/core-code-and-interfaces/the-domain) component orchestrates the inference process, assigning available [LLM workers](/core-code-and-interfaces/synthient-chain) to execute the inference based on the accepted models.
+
+### Step 4
+
+Once the inference is completed, the result is passed to the [EmbeddingEngine](/core-code-and-interfaces/synthient-chain) to compute embeddings and binary embeddings (bEmbeddings).
+
+### Step 5
+
+The bEmbeddings are then used in the [consensus mechanism](/consensus-mechanism) to ensure agreement among peers. This involves a commit-reveal process, quorum building, and clustering algorithms to determine the final consensus result.
+
+### Step 6
+
+The consensus result is propagated through the [P2P networks](/core-code-and-interfaces/synthient-chain) to other peers, and the final output is persisted to the relevant databases and, potentially, the initiating blockchain.
+</Steps>
+
+## Key Objects and Interfaces
+
+Rakis employs several key objects and interfaces to facilitate the inference process and maintain the integrity of the decentralized network:
+
+### InferenceRequest
+
+The `InferenceRequest` object encapsulates the parameters for an inference task, including the prompt, accepted models, temperature, max tokens, and a security frame (`InferenceSecurityFrame`). It serves as the entry point for inference requests in the system.
+
+```typescript
+export type InferenceRequest = Required<UnprocessedInferenceRequest>;
+
+export type UnprocessedInferenceRequest = {
+  requestId?: string; // Could just be a hash of known-to-be-unique values
+  payload: InferenceRequestPayload;
+  endingAt?: Date; // Computed from the securityframe
+  fetchedAt: Date;
+};
+```
+
+### InferenceSecurityFrame
+
+The `InferenceSecurityFrame` defines the security parameters for an inference request, such as the required quorum size, maximum time allowed, embedding distance threshold, and the percentage of peers that must be within the specified distance. This allows for adjustable security bindings based on the application's requirements.
+
+```typescript
+export type InferenceSecurityFrame = {
+  quorum: number; // Number of inferences that need to happen for a quorum
+  maxTimeMs: number; // Max amount of time that this round can take before failed inference
+  secDistance: number; // Distance in embeddingspace
+  secPercentage: number; // Percentage of quorum that needs to be within secDistance embedding distance
+  embeddingModel: EmbeddingModelName;
+};
+```
+
+### PeerPacket
+
+The `PeerPacket` interface represents the various packets exchanged between peers on the network. These packets facilitate the commit-reveal process, inference requests, consensus results, and other coordination tasks.
+
+```typescript
+export type PeerPacket =
+  | PeerStatusUpdate
+  | PeerHeart
+  | PeerInfo
+  | PeerConnectedChain
+  | InferenceCommit
+  | InferenceRevealRequest
+  | KnownPeers
+  | InferenceReveal
+  | P2PInferenceRequestPacket
+  | InferenceRevealRejected
+  | InferenceQuorumComputed;
+```
+
+<Callout>
+The `PeerPacket` interface encompasses various packet types, such as `InferenceCommit`, `InferenceRevealRequest`, `InferenceReveal`, and `InferenceQuorumComputed`, which are crucial for the commit-reveal process and consensus mechanism.
+</Callout>
+
+### InferenceQuorum
+
+The `InferenceQuorum` object represents the quorum state for a specific inference request, including the committed and revealed inferences, the quorum threshold, and the current status of the quorum (e.g., awaiting commitments, awaiting reveal, failed, or completed).
+
+```typescript
+export type InferenceQuorum = {
+  requestId: string;
+  status:
+    | "awaiting_commitments"
+    | "awaiting_reveal"
+    | "failed"
+    | "completed"
+    | "awaiting_consensus" // means getting the embeddings and other processing ready
+    | "verifying_consensus";
+  quorumThreshold: number;
+  endingAt: Date; // Stringified date
+  quorumCommitted: number; // Number of peers that have committed a hash
+  quorumRevealed: number; // Number of peers that have revealed their embedding
+  consensusRequestedAt?: Date; // Time that the consensus was requested
+  embeddingModel: EmbeddingModelName;
+  quorum: {
+    inferenceId: string;
+    synthientId: string;
+    bEmbeddingHash: string;
+    commitReceivedAt: Date;
+    reveal?: {
+      embedding: number[];
+      bEmbedding: number[];
+      output: string;
+      receivedAt: Date;
+    };
+  }[];
+};
+```
+
+These key objects and interfaces, along with their interactions, facilitate the decentralized inference process within the Rakis network.
+
+## Dependencies and Key Projects
+
+Rakis builds upon several key projects and dependencies to enable its functionality:
+
+- [webllm.js](https://github.com/mlc-ai/web-llm): A lightweight library for running LLMs in the browser, used in Rakis for inference tasks.
+- [nomic-ai/nomic-embed-text](https://github.com/nomic-ai/nomic-embed-text): A text embedding model used for computing embeddings and bEmbeddings in Rakis.
+- [trystero](https://github.com/colyseus/trystero): A WebRTC-based peer-to-peer network library used for one of the P2P networks in Rakis.
+- [gun](https://github.com/amark/gun): A distributed database and peer-to-peer network used as another P2P network in Rakis.
+- [nkn](https://github.com/nknorg/nkn-client-js): A blockchain-based P2P network used in Rakis for decentralized communication.
+
+By leveraging these projects and dependencies, Rakis builds upon existing technologies and contributes novel solutions for decentralized inference and consensus mechanisms.
+
+For a more comprehensive understanding of the core code and interfaces, refer to the following subsections:
+
+- [Synthient Chain](/core-code-and-interfaces/synthient-chain)
+- [Databases](/core-code-and-interfaces/databases)
+- [The Domain](/core-code-and-interfaces/the-domain)
+
+These subsections will provide detailed insights into the individual components and their roles within the Rakis architecture.

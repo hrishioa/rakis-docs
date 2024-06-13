@@ -1,0 +1,59 @@
+import { Callout, Steps, Step } from "nextra-theme-docs";
+
+# Creation and Motivation
+
+The creation of Rakis was driven by a desire to explore the intersection of artificial intelligence and decentralized systems, with a focus on enabling new possibilities for AI applications within the context of peer-to-peer networks and smart contracts.
+
+<Callout emoji="💡">
+Rakis was born out of a curiosity to push the boundaries of what can be achieved with AI in a decentralized and permissionless environment.
+</Callout>
+
+## Inspiration
+
+The inspiration for Rakis stemmed from several key observations and challenges in the AI and blockchain space:
+
+1. **Centralization of AI Services**: Despite the revolutionary potential of AI, many of the current AI services and models are controlled by a handful of large tech companies, which can lead to issues around privacy, fairness, and accessibility.
+
+2. **Limitations of On-Chain AI**: While blockchain technologies offer decentralization and transparency, the computational constraints and deterministic nature of smart contracts pose significant challenges for running complex AI models on-chain.
+
+3. **Lack of Decentralized Oracles for AI**: Integrating AI capabilities with decentralized applications (dApps) and smart contracts often relies on centralized oracles, which can undermine the trustless nature of these systems.
+
+## Development Journey
+
+The development of Rakis began as an attempt to address these challenges by creating a decentralized network for AI inference that could run entirely in the browser. The initial goal was to enable permissionless and trustless access to AI capabilities, without relying on centralized services or oracles.
+
+<Steps>
+
+### Step 1
+
+The first step was to explore the feasibility of running AI models in the browser using WebAssembly and other technologies like WebGPU. This involved experimenting with various AI frameworks and libraries, as well as optimizing the models for efficient execution in a web environment.
+
+### Step 2
+
+With the ability to run AI models in the browser established, the next challenge was to create a peer-to-peer network that could facilitate the distribution and coordination of inference tasks across a decentralized network of nodes.
+
+</Steps>
+
+This involved investigating various peer-to-peer protocols, such as WebRTC, GunDB, and NoStr, and developing mechanisms for peer discovery, message routing, and consensus-building.
+
+<Callout emoji="⚠️">
+One of the key challenges faced during the development of Rakis was the non-deterministic nature of AI models, which made it difficult to achieve consensus across the decentralized network.
+</Callout>
+
+To address this, a novel consensus mechanism based on embeddings and adjustable security bindings was developed, allowing for flexible trade-offs between security and performance based on the specific requirements of the application.
+
+## Challenges Faced
+
+Throughout the development process, several challenges were encountered, including:
+
+1. **Performance Optimization**: Running AI models in the browser required careful optimization to ensure acceptable performance levels, especially on resource-constrained devices like mobile phones.
+
+2. **Network Stability and Robustness**: Building a reliable and fault-tolerant peer-to-peer network that could handle node churn, network partitions, and adversarial behavior was a significant challenge.
+
+3. **Incentive Mechanisms**: Designing incentive mechanisms to encourage participation and discourage malicious behavior in a decentralized network without relying on traditional blockchain-based incentives was a complex problem.
+
+4. **User Experience**: Providing a seamless user experience for interacting with the decentralized AI network, especially for non-technical users, required careful consideration and design.
+
+Despite these challenges, the development of Rakis has yielded a novel and exciting approach to decentralized AI inference, paving the way for new applications and use cases that leverage the power of AI in a trustless and permissionless manner.
+
+In the next section, [Intended Uses and Goals](/story-of-rakis/intended-uses-and-goals), we'll explore the envisioned applications and long-term goals of the Rakis project.
