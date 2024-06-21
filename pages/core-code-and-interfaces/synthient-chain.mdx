@@ -6,13 +6,13 @@ The Synthient Chain is a key component of the Rakis architecture, comprising var
 
 ## Identity Management
 
-Rakis employs a unique identity system called "Synthients" to identify peers within the network. Each peer is assigned a public-private key pair, with the public key serving as the synthient ID.
+Rakis implements a unique identity system called "Synthients" to identify peers within the network. Each peer is assigned a public-private key pair, with the public key serving as the synthient ID.
 
 <Callout>
 The `synthientId` is a unique identifier representing a peer's public key on the Synthient network.
 </Callout>
 
-Peers can also associate their synthient ID with one or more blockchain addresses, effectively linking their on-chain identities to their Rakis identity. This association is established by signing the synthient ID with the private key corresponding to the on-chain address, creating a `synthientIdSignature`.
+Peers can also associate their synthient ID with one or more blockchain addresses, thereby *Linking* their on-chain identities to their Rakis identity. This association is established by signing the synthient ID with the private key corresponding to the on-chain address, creating a `synthientIdSignature`.
 
 ```typescript
 export type ChainIdentity = {
@@ -251,6 +251,6 @@ const unregisterCallback = p2pNetworkInstance.listenForPacket((packet, peerInfo)
 
 The provided callback function will be invoked whenever a new packet is received from the network, passing the received packet and information about the peer that sent it.
 
-By leveraging multiple P2P networks, Rakis ensures reliable message delivery and fault tolerance, ensuring that the network can continue functioning even if one or more P2P networks experience issues.
+By having multiple P2P networks, Rakis ensures reliable message delivery and fault tolerance, ensuring that the network can continue functioning even if one or more P2P networks experience issues.
 
 [Next: Databases](/core-code-and-interfaces/databases)

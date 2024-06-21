@@ -159,6 +159,10 @@ This event-driven architecture allows for loose coupling between components and 
 
 Here's a mermaid diagram illustrating the connections and event flow between the core components of [The Domain](/the-domain):
 
+
+
+
+
 ```mermaid
 graph TD
   subgraph TheDomain
@@ -178,6 +182,7 @@ graph TD
 
   EmbeddingEngine -- Worker Events --> TheDomain
   LLMEngine -- Worker Events --> TheDomain
+
 ```
 
 In this diagram, [TheDomain](/the-domain) acts as the central component, managing the connections and event flows between the other components. The [PacketDB](/packet-db) handles the incoming and outgoing packets from the P2P networks and communicates with the [InferenceDB](/inference-db). The [InferenceDB](/inference-db) emits various events related to inference requests, embeddings, and consensus, which are consumed by [TheDomain](/the-domain), [EmbeddingEngine](/embedding-engine), and [LLMEngine](/llm-engine). The [EmbeddingEngine](/embedding-engine) and [LLMEngine](/llm-engine) emit worker-related events, which are consumed by [TheDomain](/the-domain) for managing the inference and embedding queues.
