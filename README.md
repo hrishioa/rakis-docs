@@ -1,9 +1,3 @@
-## Rakis - made with Lumentis
+# Documentation for Rakis
 
-`curl -fsSL https://bun.sh/install | bash # Install bun for macOS, Linux, and WSL`
-
-`bun install`
-
-`bun dev`
-
-Change things in `pages` to see the effect.
+This is the documentation site (partly generated with [Lumentis](https://github.com/hrishioa/lumentis)) for [Rakis](https://rakis.ai), an on-browser decentralized inference network.
