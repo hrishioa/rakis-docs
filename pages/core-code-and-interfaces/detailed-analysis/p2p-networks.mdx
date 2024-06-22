@@ -102,8 +102,34 @@ Rakis supports multiple P2P networks for message passing, providing redundancy a
 - NKN
 - Trystero (Nostr and Torrent)
 
+```mermaid
+graph TB
+    subgraph "Rakis Network"
+    A[Node 1] <--> B[Node 2]
+    A <--> C[Node 3]
+    B <--> D[Node 4]
+    C <--> D
+    B <--> E[Node 5]
+    D <--> E
+    end
+
+    subgraph "External Networks"
+    F[Gun/PewPew]
+    G[NKN]
+    H[Nostr]
+    I[WebTorrent]
+    end
+
+    A -.-> F & G
+    B -.-> G & H
+    C -.-> H & I
+    D -.-> F & I
+    E -.-> G & I
+```
+
 <Callout>
-The specific P2P networks used can be configured in the settings. By default, Rakis uses GunDB, NKN, and Trystero (both Nostr and Torrent).
+  The specific P2P networks used can be configured in the settings. By default,
+  Rakis uses GunDB, NKN, and Trystero (both Nostr and Torrent).
 </Callout>
 
 These networks are implemented as separate classes extending the `P2PNetworkInstance` abstract class, which defines the common interface for broadcasting and listening to packets.
@@ -174,10 +200,7 @@ The P2P networks are initialized during the [Rakis Domain](/the-domain) startup 
 ```typescript
 const p2pNetworkInstances: P2PNetworkInstance<any, any>[] =
   settings.theDomainSettings.enabledP2PNetworks.map((network) =>
-    P2PNetworkFactory.createP2PNetworkInstance(
-      network,
-      clientInfo.synthientId
-    )
+    P2PNetworkFactory.createP2PNetworkInstance(network, clientInfo.synthientId)
   );
 
 const workingP2PNetworkInstances =

@@ -23,14 +23,21 @@ The LLM Engine follows a modular architecture, separating concerns and enabling 
 2. **LLMWorker**: Represents an individual worker responsible for executing inference tasks using a specific language model.
 3. **MLCEngine**: A wrapper around the `@mlc-ai/web-llm` library, which provides the underlying language model capabilities.
 
-<Mermaid>
 ```mermaid
-graph TD
-    LLMEngine --> LLMWorker
-    LLMWorker --> MLCEngine
-    MLCEngine --> Language_Model_API
+stateDiagram-v2
+    [*] --> Initializing
+    Initializing --> Loading: Created
+    Loading --> Ready: Model Loaded
+    Ready --> Busy: Assigned Task
+    Busy --> Ready: Task Completed
+    Ready --> Unloading: Scale Down
+    Unloading --> [*]
+
+    Ready --> Error: Error Occurred
+    Busy --> Error: Error Occurred
+    Error --> Restarting: Auto-restart
+    Restarting --> Loading
 ```
-</Mermaid>
 
 The `LLMEngine` class orchestrates the creation and management of `LLMWorker` instances. Each `LLMWorker` encapsulates a specific language model and handles inference tasks for that model. The `MLCEngine` class acts as a bridge between the `LLMWorker` and the underlying language model API provided by the `@mlc-ai/web-llm` library.
 
@@ -41,7 +48,8 @@ The `LLMEngine` class orchestrates the creation and management of `LLMWorker` in
 The LLM Engine provides a robust worker management system that enables dynamic scaling of language model workers based on demand. The `scaleLLMWorkers` method allows you to specify the desired number of workers for a particular language model, and the engine automatically handles the creation or termination of workers as needed.
 
 <Callout>
-The LLM Engine automatically scales the number of workers based on the workload, ensuring efficient resource utilization and optimal performance.
+  The LLM Engine automatically scales the number of workers based on the
+  workload, ensuring efficient resource utilization and optimal performance.
 </Callout>
 
 ### Inference Task Processing
@@ -50,8 +58,8 @@ The `runInference` and `runInferenceNonStreaming` methods of the `LLMEngine` cla
 
 ```typescript
 const response = await engine.runInferenceNonStreaming({
-  modelName: 'gemma-2b-it-q4f16_1',
-  messages: [{ role: 'user', content: 'What is the capital of France?' }],
+  modelName: "gemma-2b-it-q4f16_1",
+  messages: [{ role: "user", content: "What is the capital of France?" }],
 });
 
 console.log(response.result); // Prints the inference result
@@ -62,7 +70,9 @@ console.log(response.result); // Prints the inference result
 The LLM Engine supports a wide range of language models, allowing you to leverage the most suitable model for your use case. The list of available models is defined in the `availableModels` constant within the `types.ts` file.
 
 <Callout>
-You can easily extend the LLM Engine to support additional language models by updating the `availableModels` constant and providing the necessary integration code.
+  You can easily extend the LLM Engine to support additional language models by
+  updating the `availableModels` constant and providing the necessary
+  integration code.
 </Callout>
 
 ### Logging and Monitoring
@@ -87,7 +97,7 @@ To use the LLM Engine, follow these steps:
 Import the necessary classes and types:
 
 ```typescript
-import { LLMEngine, LLMModelName } from './llm/types';
+import { LLMEngine, LLMModelName } from "./llm/types";
 ```
 
 ### Step 2
@@ -103,7 +113,7 @@ const engine = new LLMEngine();
 Scale the number of workers for the desired language models using the `scaleLLMWorkers` method:
 
 ```typescript
-await engine.scaleLLMWorkers('gemma-2b-it-q4f16_1', 2);
+await engine.scaleLLMWorkers("gemma-2b-it-q4f16_1", 2);
 ```
 
 ### Step 4
@@ -112,8 +122,8 @@ Submit inference requests using the `runInference` or `runInferenceNonStreaming`
 
 ```typescript
 const response = await engine.runInferenceNonStreaming({
-  modelName: 'gemma-2b-it-q4f16_1',
-  messages: [{ role: 'user', content: 'What is the capital of France?' }],
+  modelName: "gemma-2b-it-q4f16_1",
+  messages: [{ role: "user", content: "What is the capital of France?" }],
 });
 
 console.log(response.result); // Prints the inference result
@@ -129,4 +139,3 @@ The LLM Engine provides additional functionality and customization options for a
 - **Worker Availability**: The `getWorkerAvailability` method returns the availability of workers for specific language models, allowing you to make informed decisions about scaling and load balancing.
 - **Inference Cancellation**: The `abortWorkerInference` method enables you to cancel an ongoing inference task for a specific worker, providing fine-grained control over inference execution.
 - **Logging and Monitoring**: The LLM Engine provides comprehensive logging and monitoring capabilities through the `LLMEngineLogEntry` type and the `searchEngineLogs` and `getEngineLogs` methods, allowing you to track engine activities and performance.
-

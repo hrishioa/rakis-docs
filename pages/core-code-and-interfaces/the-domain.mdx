@@ -4,12 +4,17 @@ import { Callout, Steps, Step } from "nextra-theme-docs";
 
 The Domain is the central orchestrator of the Rakis network, responsible for managing the various components and coordinating the overall system. It serves as the entry point for interacting with the network and handles the flow of data among different layers.
 
+<Callout>
+  The Domain is named after the forerunner network from the Halo world.
+</Callout>
+
 ## Settings
 
 Before diving into the details of The Domain, it's essential to understand the settings that govern its behavior. These settings are loaded from the user's local storage or a default configuration if no stored settings are found. The `loadSettings` function retrieves these settings, merging any user-defined values with the default settings.
 
 <Callout>
-**Note:** The settings can be modified at runtime using the `saveSettings` function, which persists the changes in the user's local storage.
+  **Note:** The settings can be modified at runtime using the `saveSettings`
+  function, which persists the changes in the user's local storage.
 </Callout>
 
 Some of the key settings that influence The Domain's behavior are:

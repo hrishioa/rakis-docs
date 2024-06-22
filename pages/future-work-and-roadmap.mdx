@@ -2,6 +2,9 @@ import { Callout, Steps, Step } from "nextra-theme-docs";
 
 # Future Work and Roadmap
 
+<Callout>
+For a more detailed look at the problems unsolved by Rakis (yet), see the [launch blog post](https://olickel.com/introducing-rakis).
+
 Rakis has a lot of moving components and layers, and is currently entering what we think is best described as a Stability Test. This section outlines some of the planned features, performance optimizations, and the long-term vision for the project.
 
 ## Planned Features
@@ -11,10 +14,8 @@ Rakis has a lot of moving components and layers, and is currently entering what 
 One of the major challenges in any decentralized network is preventing Sybil attacks, where a single entity creates multiple identities to gain an unfair advantage or influence. Currently, Rakis relies on a commitment-and-reveal system, but this is not a complete solution. Future work includes implementing robust Sybil resistance mechanisms and introducing incentive structures to encourage honest participation and discourage malicious behavior.
 
 <Callout>
-Potential solutions being explored include:
-- Proof-of-Work or Proof-of-Stake systems
-- Reputation-based incentives
-- Slashing mechanisms for bad actors
+  Potential solutions being explored include: - Proof-of-Work or Proof-of-Stake
+  systems - Reputation-based incentives - Slashing mechanisms for bad actors
 </Callout>
 
 ### Heterogeneous Inference Models
@@ -23,15 +24,8 @@ Currently, Rakis supports a limited set of pre-defined inference models. However
 
 ### Improved Consensus Algorithms
 
-The current consensus mechanism in Rakis is a simple clustering-based approach. While functional, it may not be optimal for all use cases. Future work includes exploring more advanced consensus algorithms, such as Byzantine Fault Tolerant (BFT) protocols, to improve the network's security and robustness.
-
-### Privacy and Secure Inference
-
-One of the current limitations of Rakis is the lack of privacy and secure inference capabilities. Future iterations will explore techniques such as homomorphic encryption, secure multi-party computation, and other privacy-preserving technologies to enable secure inference without exposing sensitive data.
-
-### Cross-Chain Interoperability
-
-While Rakis currently supports integration with various blockchain networks, true cross-chain interoperability remains a challenge. Future work includes developing standards and protocols to enable seamless communication and value transfer across different blockchain ecosystems, further enhancing the network's utility.
+The current consensus mechanism in Rakis is a simple clustering-based approach. While functional, it may not be optimal for all use cases. Future work includes exploring more advanced clustering algorithms, semistructured consensus, and other things discussed in the launch post.
+network's utility.
 
 ## Performance Optimizations
 
@@ -44,17 +38,12 @@ As Rakis grows and gains more users, performance optimizations will become cruci
 
 ## Long-Term Vision
 
-The long-term vision for Rakis is to become a decentralized, self-sustaining ecosystem for **Verifiable** AI inference and computate. This ecosystem would enable developers, researchers, and organizations to contribute and access AI capabilities in a secure, fair, and transparent manner.
-
-Some key aspects of this vision include:
-
-- A vibrant marketplace for AI models and services
-- Decentralized governance and decision-making processes
-- Integration with other decentralized technologies (e.g., decentralized storage, oracles)
-- Enabling new use cases and applications beyond the initial scope of Rakis
+The long-term vision for Rakis is to become a decentralized, self-sustaining ecosystem for **Verifiable** AI inference and compute. This ecosystem would enable developers, researchers, and organizations to contribute and access AI capabilities in a secure, fair, and transparent manner.
 
 <Callout>
-As an open-source project, the success of Rakis relies on the involvement and contributions of the community. We invite developers, researchers, and enthusiasts to join us in shaping the future of decentralized AI inference.
+  As an open-source project, the success of Rakis relies on the involvement and
+  contributions of the community. We invite developers, researchers, and
+  enthusiasts to join us in shaping the future of decentralized AI inference.
 </Callout>
 
-[Get involved in the Rakis project](/contributing)
+[To get more involved in Rakis, see the active TODOs here.](https://github.com/hrishioa/rakis/tree/master/todos)

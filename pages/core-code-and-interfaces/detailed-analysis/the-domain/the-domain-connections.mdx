@@ -11,7 +11,9 @@ In [The Domain](/the-domain), the various components work together through a ser
 - [LLMEngine](/llm-engine)
 
 <Callout>
-These components communicate through events, callbacks, and direct method invocations. Understanding their connections and the flow of data is crucial for comprehending the overall architecture and functionality of Rakis.
+  These components communicate through events, callbacks, and direct method
+  invocations. Understanding their connections and the flow of data is crucial
+  for comprehending the overall architecture and functionality of Rakis.
 </Callout>
 
 ## Peer-to-Peer Packet Flow
@@ -159,30 +161,44 @@ This event-driven architecture allows for loose coupling between components and 
 
 Here's a mermaid diagram illustrating the connections and event flow between the core components of [The Domain](/the-domain):
 
-
-
-
-
 ```mermaid
 graph TD
-  subgraph TheDomain
-    TheDomain --> PacketDB
-    TheDomain --> InferenceDB
-    TheDomain --> EmbeddingEngine
-    TheDomain --> LLMEngine
-  end
+    A[TheDomain]
+    B[PacketDB]
+    C[InferenceDB]
+    D[EmbeddingEngine]
+    E[LLMEngine]
+    F[P2P Networks]
 
-  PacketDB -- Incoming Packets --> P2PNetwork
-  PacketDB -- Outgoing Packets --> P2PNetwork
-  PacketDB --> InferenceDB
+    F -->|Incoming Packets| B
+    B -->|Outgoing Packets| F
 
-  InferenceDB -- Inference Events --> TheDomain
-  InferenceDB -- Embedding Events --> EmbeddingEngine
-  InferenceDB -- Inference Events --> LLMEngine
+    B -->|newP2PInferenceRequest| C
+    B -->|newInferenceCommit| C
+    B -->|newInferenceRevealRequest| C
+    B -->|newInferenceRevealed| C
 
-  EmbeddingEngine -- Worker Events --> TheDomain
-  LLMEngine -- Worker Events --> TheDomain
+    C -->|newActiveInferenceRequest| A
+    C -->|inferenceResultAwaitingEmbedding| A
+    C -->|newInferenceEmbedding| A
 
+    A -->|processInferenceRequestQueue| E
+    A -->|processEmbeddingQueue| D
+
+    E -->|workerFree| A
+    D -->|workerFree| A
+
+    C -->|requestQuorumReveal| A
+    C -->|consensusPackets| A
+
+    A -->|transmitPacket| B
+
+    style A fill:#f9f,stroke:#333,stroke-width:4px
+    style B fill:#bfb,stroke:#333,stroke-width:2px
+    style C fill:#bbf,stroke:#333,stroke-width:2px
+    style D fill:#fbb,stroke:#333,stroke-width:2px
+    style E fill:#fbf,stroke:#333,stroke-width:2px
+    style F fill:#ddd,stroke:#333,stroke-width:2px
 ```
 
 In this diagram, [TheDomain](/the-domain) acts as the central component, managing the connections and event flows between the other components. The [PacketDB](/packet-db) handles the incoming and outgoing packets from the P2P networks and communicates with the [InferenceDB](/inference-db). The [InferenceDB](/inference-db) emits various events related to inference requests, embeddings, and consensus, which are consumed by [TheDomain](/the-domain), [EmbeddingEngine](/embedding-engine), and [LLMEngine](/llm-engine). The [EmbeddingEngine](/embedding-engine) and [LLMEngine](/llm-engine) emit worker-related events, which are consumed by [TheDomain](/the-domain) for managing the inference and embedding queues.

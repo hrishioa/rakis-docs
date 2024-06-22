@@ -2,10 +2,13 @@ import { Callout, Steps, Step } from "nextra-theme-docs";
 
 # Distributed Consensus
 
-Rakis achieves distributed consensus for inference results through a novel consensus protocol inspired by the Byzantine Fault Tolerance (BFT) algorithm. The protocol is designed to ensure that a single, consistent inference result emerges even in the presence of faulty or malicious nodes.
+Rakis achieves distributed consensus for inference results through a novel consensus protocol inspired by the Raft algorithm. The protocol is designed to ensure that a single, consistent inference result emerges even in the presence of faulty or malicious nodes.
 
 <Callout>
-The distributed consensus mechanism is a critical component of Rakis, as it allows the network to function without a centralized authority or trusted third party. By leveraging the collective computational power of the network, Rakis can produce reliable and trustworthy inference results.
+  The distributed consensus mechanism is a critical component of Rakis, as it
+  allows the network to function without a centralized authority or trusted
+  third party. By leveraging the collective computational power of the network,
+  Rakis can produce reliable and trustworthy inference results.
 </Callout>
 
 ## The Consensus Protocol
@@ -24,7 +27,7 @@ The Rakis consensus protocol follows these steps:
 
 ### Step 3
 
-3. Each node computes a binary embedding hash (`bEmbeddingHash`) of its inference result using a specified embedding model. The `bEmbeddingHash` represents a compact and consistent representation of the inference result.
+3. Each node computes a binary embedding hash (`bEmbeddingHash`) of its inference result using a specified embedding model (combined with the synthientId of the node itself). The `bEmbeddingHash` represents a compact and consistent representation of the inference result.
 
 ### Step 4
 
@@ -55,7 +58,9 @@ The consensus protocol leverages the following key components:
 - **Clustering and Consensus Selection**: The clustering process identifies the largest group of nodes with similar inference results (within the specified embedding distance threshold). A deterministic function then selects the final consensus result from this group.
 
 <Callout>
-The use of binary embeddings, quorum formation, and clustering techniques allows Rakis to achieve distributed consensus in a decentralized and trustless manner, without relying on a centralized authority or trusted third party.
+  The use of binary embeddings, quorum formation, and clustering techniques
+  allows Rakis to achieve distributed consensus in a decentralized and trustless
+  manner, without relying on a centralized authority or trusted third party.
 </Callout>
 
 ## Quorum Management
@@ -63,7 +68,9 @@ The use of binary embeddings, quorum formation, and clustering techniques allows
 The quorum management process in Rakis is handled by the [QuorumDB](/inference-db/inference-db-quorum-db) component. It is responsible for tracking the state of inference quorums, coordinating the reveal process, and triggering the consensus verification phase.
 
 <Callout>
-The QuorumDB plays a crucial role in the consensus protocol, ensuring that the quorum formation, reveal, and consensus verification stages proceed smoothly and in a timely manner.
+  The QuorumDB plays a crucial role in the consensus protocol, ensuring that the
+  quorum formation, reveal, and consensus verification stages proceed smoothly
+  and in a timely manner.
 </Callout>
 
 Here's a high-level overview of the quorum management process:
@@ -106,7 +113,9 @@ def compute_bEmbeddingHash(inference_result):
 Nodes that fail the embedding verification are discarded from the quorum, ensuring that only valid and consistent inference results are considered during the consensus selection process.
 
 <Callout>
-The use of binary embeddings and their hashes (`bEmbeddingHash`) provides a compact and efficient way to represent and verify inference results, reducing the network overhead and computational cost of the consensus process.
+  The use of binary embeddings and their hashes (`bEmbeddingHash`) provides a
+  compact and efficient way to represent and verify inference results, reducing
+  the network overhead and computational cost of the consensus process.
 </Callout>
 
 ## Consensus Selection
@@ -131,18 +140,21 @@ import hashlib
 def select_consensus_result(valid_inferences):
     # Concatenate inference results and compute a joint hash
     joint_hash = hashlib.sha256(''.join(sorted(valid_inferences)).encode()).hexdigest()
-    
+
     # Use the joint hash to deterministically select a result
     selected_index = int(joint_hash[:16], 16) % len(valid_inferences)
     consensus_result = valid_inferences[selected_index]
-    
+
     return consensus_result
 ```
 
 By leveraging the clustering and deterministic selection processes, Rakis ensures that the final consensus result is consistent across the network and represents the majority opinion of the valid quorum members.
 
 <Callout>
-The consensus selection mechanism in Rakis is designed to be decentralized, deterministic, and resistant to manipulation or collusion attacks, ensuring the integrity and trustworthiness of the inference results produced by the network.
+  The consensus selection mechanism in Rakis is designed to be decentralized,
+  deterministic, and resistant to manipulation or collusion attacks, ensuring
+  the integrity and trustworthiness of the inference results produced by the
+  network.
 </Callout>
 
 [Next: Inference DB →](/inference-db)
